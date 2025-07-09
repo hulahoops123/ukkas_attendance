@@ -1,8 +1,10 @@
+import { useLocalDb } from '~/composables/useLocalDb'
+
 export default defineNuxtRouteMiddleware((to, from) => {
   if (process.client) {
-    const { adminExists } = useAdminSetup()
-    if (!adminExists() && to.path !== '/setup') {
-      return navigateTo('/setup')
+    const { hasAdmin } = useLocalDb()
+    if (!hasAdmin() && to.path !== '/adduser') {
+      return navigateTo('/adduser')
     }
   }
 })
