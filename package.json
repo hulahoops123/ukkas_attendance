@@ -19,8 +19,7 @@
   "dependencies": {
     "@nuxtjs/google-fonts": "^3.0.1",
     "@vueuse/components": "^10.3.0",
-    "@vueuse/firebase": "^10.2.1",
     "@vueuse/nuxt": "^10.1.2",
-    "firebase": "^9.23.0"
+    "face-api.js": "^0.22.2"
   }
 }
