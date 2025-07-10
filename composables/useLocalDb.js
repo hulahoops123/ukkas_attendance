@@ -28,31 +28,42 @@ export function useLocalDb() {
   }
 
   // === ATTENDANCE ===
-  const attendanceRefs = new Map()
+ const attendanceRefs = useStorage('attendanceRefs', {}) // one object with all days & users
 
   function getTodayKey(employeeId) {
     return `attendance:${employeeId}:${new Date().toISOString().slice(0,10)}`
   }
 
-  function checkTodayLog(employeeId) {
+  function addAttendanceLog(employeeId, status) {
     const key = getTodayKey(employeeId)
-    if (!attendanceRefs.has(key)) {
-      attendanceRefs.set(key, useStorage(key, null))
-    }
-    return attendanceRefs.get(key)
-  }
-
-  function addAttendanceLog(todayLogRef, employeeId, status) {
     const log = {
-      employeeId,
       status,
       time: new Date().toISOString()
     }
-    todayLogRef.value = log
-    console.log(`Logged ${status} for ${employeeId} at ${log.time}`)
+
+    if (!attendanceRefs.value[key]) {
+      attendanceRefs.value[key] = []
+    }
+    attendanceRefs.value[key].push(log)
+
+    console.log(`Added ${status} for ${employeeId} under ${key}`)
+  }
+
+  function getCurrentStatus(employeeId) {
+    const key = getTodayKey(employeeId)
+    const logs = attendanceRefs.value[key]
+
+    if (logs && logs.length) {
+      // safeguard: sort to guarantee latest at end
+      logs.sort((a, b) => new Date(a.time) - new Date(b.time))
+      return logs[logs.length - 1].status
+    }
+
+    return null // no logs yet today
   }
 
   return {
+    // users
     users,
     addUser,
     clearUsers,
@@ -60,7 +71,11 @@ export function useLocalDb() {
     findMatchingUser,
     hasAdmin,
     getAdmin,
-    checkTodayLog,
-    addAttendanceLog
+
+    // attendance
+    attendanceRefs,
+    getTodayKey,
+    addAttendanceLog,
+    getCurrentStatus
   }
 }

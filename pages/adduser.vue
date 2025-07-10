@@ -36,7 +36,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLocalDb } from '~/composables/useLocalDb'
 import FaceCamera from '@/components/FaceCamera.vue'

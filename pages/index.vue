@@ -19,7 +19,7 @@
       <div class="bg-white p-6 rounded shadow-lg text-center">
         <template v-if="matchedUser?.isAdmin">
           <p class="text-xl font-bold mb-2">
-            Hi {{ currentUserName }}, you’ll be {{ nextAdminAction }} in {{ countdown }}s
+            Hi {{ currentUserName }}, you’ll be {{ getNextAction(matchedUser) }} in {{ countdown }}s
           </p>
           <button @click="goToAdminDashboard" class="mt-2 px-4 py-2 bg-purple-600 text-white rounded">
             Go to Admin Dashboard
@@ -39,14 +39,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import FaceCamera from '@/components/FaceCamera.vue'
 import { useLocalDb } from '~/composables/useLocalDb'
 import * as faceapi from 'face-api.js'
 
 const router = useRouter()
-const { getAllUsers, checkTodayLog, addAttendanceLog } = useLocalDb()
+const { getAllUsers, addAttendanceLog, getCurrentStatus } = useLocalDb()
 
 const faceCam = ref(null)
 const showOverlay = ref(true)
@@ -62,11 +62,10 @@ const countdownTimer = ref(null)
 const adminInterrupt = ref(false)
 const processing = ref(false)
 
-const nextAdminAction = computed(() => {
-  if (!matchedUser.value) return ''
-  const todayLog = checkTodayLog(matchedUser.value.name)
-  return todayLog.value?.status === 'clocked in' ? 'clocked out' : 'clocked in'
-})
+function getNextAction(user) {
+  const status = getCurrentStatus(user.name)
+  return status === 'clocked in' ? 'clocked out' : 'clocked in'
+}
 
 function isMatch(newDescriptor, storedDescriptors, threshold = 0.6) {
   if (!newDescriptor || !storedDescriptors?.length) return false
@@ -89,21 +88,13 @@ async function handleFaceFound() {
   console.log("Face found, trying to match...")
 
   try {
-    if (!faceCam.value) {
-      console.log("FaceCamera not mounted.")
-      return
-    }
+    if (!faceCam.value) return
 
     const descriptor = await faceCam.value.getDescriptor()
-    console.log("New descriptor:", descriptor)
+    if (!descriptor) return
 
-    if (!descriptor) {
-      console.log("No descriptor returned, skipping.")
-      return
-    }
-
-    const user = getAllUsers().value.find(user =>
-      isMatch(descriptor, user.descriptors)
+    const user = getAllUsers().value.find(u =>
+      isMatch(descriptor, u.descriptors)
     )
 
     if (user) {
@@ -129,10 +120,12 @@ async function handleFaceFound() {
 }
 
 function normalClockFlow(user) {
-  const todayLog = checkTodayLog(user.name)
-  const newStatus = todayLog.value?.status === 'clocked in' ? 'clocked out' : 'clocked in'
-  addAttendanceLog(todayLog, user.name, newStatus)
-  currentAction.value = todayLog.value?.status
+  const currentStatus = getCurrentStatus(user.name)
+  const newStatus = currentStatus === 'clocked in' ? 'clocked out' : 'clocked in'
+
+  addAttendanceLog(user.name, newStatus)
+
+  currentAction.value = newStatus
   showModal.value = true
 }
 
