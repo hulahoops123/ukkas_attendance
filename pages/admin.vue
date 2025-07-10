@@ -2,16 +2,20 @@
   <div class="max-w-3xl mx-auto mt-10 p-4">
     <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-    <div class="flex flex-wrap gap-3 mb-6">
-      <input v-model="searchQuery" placeholder="Search users..." 
-             class="border px-3 py-1 rounded flex-1" />
-      <button @click="goToAddUser"
-              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">+ Add User</button>
-      <button @click="exportUsers"
-              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export Users</button>
-      <button @click="deleteAllUsers"
-              class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete All Users</button>
-    </div>
+<div class="flex flex-wrap gap-3 mb-6">
+  <input v-model="searchQuery" placeholder="Search users..." 
+         class="border px-3 py-1 rounded flex-1" />
+  <button @click="goToAddUser"
+          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">+ Add User</button>
+  <button @click="exportUsers"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export Users</button>
+  <input type="file" accept=".json"
+         @change="handleImport"
+         class="border px-4 py-2 rounded cursor-pointer" />
+  <button @click="deleteAllUsers"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete All Users</button>
+</div>
+
 
     <!-- USERS -->
     <section class="mb-8">
@@ -108,6 +112,29 @@ function exportUsers() {
   downloadAnchor.click()
   downloadAnchor.remove()
 }
+
+function handleImport(event) {
+  const file = event.target.files[0]
+  if (!file) return
+
+  const reader = new FileReader()
+  reader.onload = e => {
+    try {
+      const importedUsers = JSON.parse(e.target.result)
+      if (Array.isArray(importedUsers)) {
+        users.value = importedUsers
+        alert("Users imported successfully!")
+      } else {
+        alert("Invalid format. Expected an array.")
+      }
+    } catch (err) {
+      alert("Error parsing JSON file.")
+    }
+  }
+  reader.readAsText(file)
+}
+
+
 
 function deleteUser(name) {
   users.value = users.value.filter(u => u.name !== name)
