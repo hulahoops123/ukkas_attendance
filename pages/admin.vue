@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-2xl mx-auto mt-10 p-4">
+  <div class="max-w-3xl mx-auto mt-10 p-4">
     <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
     <div class="flex flex-wrap gap-3 mb-6">
@@ -36,19 +36,25 @@
     </section>
 
     <!-- TODAY'S ATTENDANCE -->
+    
     <section>
-      <h2 class="text-xl font-semibold mb-2">Today’s Attendance</h2>
-      <div v-if="attendanceToday.length" class="space-y-2">
-        <div 
-          v-for="log in attendanceToday" :key="log.employeeId"
-          class="border p-3 rounded flex justify-between items-center"
-        >
-          <p><span class="font-bold">{{ log.employeeId }}</span> is {{ log.status }}</p>
-          <p class="text-xs text-gray-500">{{ formatTime(log.time) }}</p>
-        </div>
-      </div>
-      <p v-else class="text-gray-600">No attendance recorded today yet.</p>
-    </section>
+  <h2 class="text-xl font-semibold mb-2">Today’s Attendance Logs</h2>
+  <div v-if="Object.keys(todayLogs).length" class="space-y-4">
+    <div 
+      v-for="(logs, key) in todayLogs" :key="key"
+      class="border p-4 rounded"
+    >
+      <p class="font-bold mb-2">{{ getEmployeeNameFromKey(key) }}</p>
+      <ul class="list-disc ml-6 text-sm text-gray-700">
+        <li v-for="(log, index) in logs" :key="index">
+          {{ log.status }} at {{ formatTime(log.time) }}
+        </li>
+      </ul>
+    </div>
+  </div>
+  <p v-else class="text-gray-600">No attendance recorded today yet.</p>
+</section>
+
   </div>
 </template>
 
@@ -57,8 +63,7 @@ import { useRouter } from 'vue-router'
 import { useLocalDb } from '~/composables/useLocalDb'
 
 const router = useRouter()
-const { getAllUsers, clearUsers } = useLocalDb()
-const users = getAllUsers()
+const { users, attendanceRefs, clearUsers } = useLocalDb()
 
 const searchQuery = ref('')
 
@@ -67,18 +72,22 @@ const filteredUsers = computed(() => {
   return users.value.filter(u => u.name.toLowerCase().includes(searchQuery.value.toLowerCase()))
 })
 
-const attendanceToday = computed(() => {
-  const today = new Date().toISOString().slice(0, 10)
-  const logs = []
-  for (const user of users.value) {
-    const key = `attendance:${user.name}:${today}`
-    const stored = localStorage.getItem(key)
-    if (stored) {
-      logs.push(JSON.parse(stored))
+const todayKeyPrefix = new Date().toISOString().slice(0,10)
+
+const todayLogs = computed(() => {
+  const logs = {}
+  for (const key in attendanceRefs.value) {
+    if (key.includes(todayKeyPrefix)) {
+      logs[key] = attendanceRefs.value[key]
     }
   }
   return logs
 })
+
+function getEmployeeNameFromKey(key) {
+  // "attendance:hula:2025-07-10" -> "hula"
+  return key.split(':')[1]
+}
 
 function formatTime(iso) {
   if (!iso) return ''
@@ -109,4 +118,5 @@ function deleteAllUsers() {
     clearUsers()
   }
 }
+console.log(todayLogs.value)
 </script>
