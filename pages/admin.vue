@@ -44,62 +44,62 @@
 
       <!-- EMAIL CONFIGURATION -->
       <section class="mb-8 bg-white rounded-xl shadow-lg p-6">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-xl font-semibold">Email Configuration</h2>
-        <button @click="showEmailConfig = !showEmailConfig"
-                class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium">
-          {{ showEmailConfig ? 'Hide' : 'Configure' }}
-        </button>
-      </div>
-      
-      <div class="mb-2">
-        <p class="text-sm text-gray-600">Reports are currently sent to:</p>
-        <p class="font-semibold">{{ getReportEmail() || 'No email configured' }}</p>
-      </div>
-
-      <div v-if="showEmailConfig" class="space-y-3">
-        <div class="flex gap-3">
-          <input v-model="newEmailAddress" 
-                 type="email"
-                 placeholder="Enter custom email address"
-                 class="border-2 border-gray-200 px-4 py-2 rounded-lg flex-1 focus:border-blue-500 focus:outline-none transition-colors" />
-          <button @click="updateReportEmail"
-                  class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-            Set Custom Email
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xl font-semibold">Email Configuration</h2>
+          <button @click="showEmailConfig = !showEmailConfig"
+                  class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium">
+            {{ showEmailConfig ? 'Hide' : 'Configure' }}
           </button>
         </div>
-        <button @click="resetEmailToFirstUser"
-                class="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 transition-colors font-medium">
-          Reset to First User's Email
-        </button>
-      </div>
-    </section>
+        
+        <div class="mb-2">
+          <p class="text-sm text-gray-600">Reports are currently sent to:</p>
+          <p class="font-semibold">{{ getReportEmail() || 'No email configured' }}</p>
+        </div>
+
+        <div v-if="showEmailConfig" class="space-y-3">
+          <div class="flex gap-3">
+            <input v-model="newEmailAddress" 
+                   type="email"
+                   placeholder="Enter custom email address"
+                   class="border-2 border-gray-200 px-4 py-2 rounded-lg flex-1 focus:border-blue-500 focus:outline-none transition-colors" />
+            <button @click="updateReportEmail"
+                    class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+              Set Custom Email
+            </button>
+          </div>
+          <button @click="resetEmailToFirstUser"
+                  class="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 transition-colors font-medium">
+            Reset to First User's Email
+          </button>
+        </div>
+      </section>
 
       <!-- USERS -->
       <section class="mb-8 bg-white rounded-xl shadow-lg p-6">
-      <h2 class="text-xl font-semibold mb-2">
-        {{ searchQuery ? `Searching for '${searchQuery}'` : 'Registered Users' }}
-      </h2>
-      <h2 class="text-xl font-semibold mb-2">Current User: {{ getCurrentUser()?.name || 'Not logged in' }}</h2>
-      <!-- <h2 class="text-xl font-semibold mb-2">{{ temp }}</h2> -->
-      <div v-if="filteredUsers.length" class="space-y-2">
-        <div 
-          v-for="user in filteredUsers" :key="user.name" 
-          class="border-2 border-gray-100 p-4 rounded-lg flex justify-between items-center hover:border-gray-200 transition-colors"
-        >
-          <div>
-            <p class="font-bold text-lg text-gray-800">{{ user.name }}</p>
-            <p class="text-sm text-gray-600">{{ user.email || 'No email' }}</p>
-            <p v-if="user.isAdmin" class="text-xs text-purple-600 font-semibold bg-purple-100 px-2 py-1 rounded-full inline-block mt-1">Admin</p>
+        <h2 class="text-xl font-semibold mb-2">
+          {{ searchQuery ? `Searching for '${searchQuery}'` : 'Registered Users' }}
+        </h2>
+        <h2 class="text-xl font-semibold mb-2">Current User: {{ getCurrentUser()?.name || 'Not logged in' }}</h2>
+        <!-- <h2 class="text-xl font-semibold mb-2">{{ temp }}</h2> -->
+        <div v-if="filteredUsers.length" class="space-y-2">
+          <div 
+            v-for="user in filteredUsers" :key="user.name" 
+            class="border-2 border-gray-100 p-4 rounded-lg flex justify-between items-center hover:border-gray-200 transition-colors"
+          >
+            <div>
+              <p class="font-bold text-lg text-gray-800">{{ user.name }}</p>
+              <p class="text-sm text-gray-600">{{ user.email || 'No email' }}</p>
+              <p v-if="user.isAdmin" class="text-xs text-purple-600 font-semibold bg-purple-100 px-2 py-1 rounded-full inline-block mt-1">Admin</p>
+            </div>
+            <button @click="handleDeleteUser(user.name)"
+                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium shadow-md">
+              Delete
+            </button>
           </div>
-          <button @click="handleDeleteUser(user.name)"
-                  class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium shadow-md">
-            Delete
-          </button>
         </div>
-      </div>
-      <p v-else class="text-gray-600">No users registered yet.</p>
-    </section>
+        <p v-else class="text-gray-600">No users registered yet.</p>
+      </section>
 
       <!-- TODAY'S ATTENDANCE -->
       <section class="bg-white rounded-xl shadow-lg p-6">
