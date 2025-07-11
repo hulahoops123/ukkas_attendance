@@ -67,9 +67,11 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { useLocalDb } from '~/composables/useLocalDb'
+import { useEmail } from '~/composables/useEmail'
 
 const router = useRouter()
 const { users, attendanceRefs, deleteUser, deleteAllUsers, currentUser, getCurrentUser } = useLocalDb()
+const { sendEmail } = useEmail()
 
 const searchQuery = ref('')
 
@@ -157,22 +159,51 @@ function confirmDeleteAllUsers() {
   }
 }
 
-function emailAttendanceLogs() {
+async function emailAttendanceLogs(event) {
   const firstUser = users.value[0]
   if (!firstUser || !firstUser.email) {
     alert("No email address found. Please ensure the first user has an email address.")
     return
   }
 
-  // Format today's attendance logs for email
-  const emailBody = formatAttendanceForEmail()
-  const subject = `Attendance Report - ${new Date().toLocaleDateString()}`
-  
-  // Create mailto link
-  const mailtoLink = `mailto:${firstUser.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`
-  
-  // Open email client
-  window.location.href = mailtoLink
+  try {
+    // Show loading state
+    const button = event.target
+    const originalText = button.textContent
+    button.textContent = 'Sending...'
+    button.disabled = true
+
+    // Format today's attendance logs for email
+    const emailBody = formatAttendanceForEmail()
+    const subject = `Attendance Report - ${new Date().toLocaleDateString()}`
+    
+    // Send email using the composable
+    const result = await sendEmail(
+      firstUser.email,
+      firstUser.name,
+      subject,
+      emailBody
+    )
+
+    if (result.success) {
+      alert('Attendance report sent successfully!')
+    } else {
+      throw new Error(result.error)
+    }
+    
+    // Restore button state
+    button.textContent = originalText
+    button.disabled = false
+    
+  } catch (error) {
+    console.error('Failed to send email:', error)
+    alert('Failed to send email. Please try again.')
+    
+    // Restore button state
+    const button = event.target
+    button.textContent = 'Email Attendance'
+    button.disabled = false
+  }
 }
 
 function formatAttendanceForEmail() {
