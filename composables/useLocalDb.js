@@ -49,12 +49,35 @@ const currentUser = useStorage('currentUser', null, undefined, {
   }
 })
 
+const emailConfig = useStorage('emailConfig', {
+  reportEmail: null,
+  useCustomEmail: false
+})
+
 function setCurrentUser(user) {
   currentUser.value = user
 }
 
 function getCurrentUser() {
   return currentUser.value
+}
+
+function setReportEmail(email) {
+  emailConfig.value.reportEmail = email
+  emailConfig.value.useCustomEmail = true
+}
+
+function getReportEmail() {
+  if (emailConfig.value.useCustomEmail && emailConfig.value.reportEmail) {
+    return emailConfig.value.reportEmail
+  }
+  // Fallback to first user's email
+  return users.value[0]?.email || null
+}
+
+function resetToFirstUserEmail() {
+  emailConfig.value.useCustomEmail = false
+  emailConfig.value.reportEmail = null
 }
 
 
@@ -104,9 +127,15 @@ function getCurrentUser() {
     getAdmin,
     deleteUser,
     deleteAllUsers,
-      currentUser,
-  setCurrentUser,
-  getCurrentUser,
+    currentUser,
+    setCurrentUser,
+    getCurrentUser,
+
+    // email config
+    emailConfig,
+    setReportEmail,
+    getReportEmail,
+    resetToFirstUserEmail,
 
     // attendance
     attendanceRefs,

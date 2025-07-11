@@ -18,6 +18,39 @@
               class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Email Attendance</button>
     </div>
 
+    <!-- EMAIL CONFIGURATION -->
+    <section class="mb-8 border p-4 rounded bg-gray-50">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-semibold">Email Configuration</h2>
+        <button @click="showEmailConfig = !showEmailConfig"
+                class="text-blue-600 hover:text-blue-800 text-sm">
+          {{ showEmailConfig ? 'Hide' : 'Configure' }}
+        </button>
+      </div>
+      
+      <div class="mb-2">
+        <p class="text-sm text-gray-600">Reports are currently sent to:</p>
+        <p class="font-semibold">{{ getReportEmail() || 'No email configured' }}</p>
+      </div>
+
+      <div v-if="showEmailConfig" class="space-y-3">
+        <div class="flex gap-2">
+          <input v-model="newEmailAddress" 
+                 type="email"
+                 placeholder="Enter custom email address"
+                 class="border px-3 py-2 rounded flex-1" />
+          <button @click="updateReportEmail"
+                  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Set Custom Email
+          </button>
+        </div>
+        <button @click="resetEmailToFirstUser"
+                class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700">
+          Reset to First User's Email
+        </button>
+      </div>
+    </section>
+
     <!-- USERS -->
     <section class="mb-8">
       <h2 class="text-xl font-semibold mb-2">Registered Users</h2>
@@ -70,10 +103,12 @@ import { useLocalDb } from '~/composables/useLocalDb'
 import { useEmail } from '~/composables/useEmail'
 
 const router = useRouter()
-const { users, attendanceRefs, deleteUser, deleteAllUsers, currentUser, getCurrentUser } = useLocalDb()
+const { users, attendanceRefs, deleteUser, deleteAllUsers, currentUser, getCurrentUser, emailConfig, setReportEmail, getReportEmail, resetToFirstUserEmail } = useLocalDb()
 const { sendEmail } = useEmail()
 
 const searchQuery = ref('')
+const showEmailConfig = ref(false)
+const newEmailAddress = ref('')
 
 const filteredUsers = computed(() => {
   if (!searchQuery.value) return users.value
@@ -160,9 +195,9 @@ function confirmDeleteAllUsers() {
 }
 
 async function emailAttendanceLogs(event) {
-  const firstUser = users.value[0]
-  if (!firstUser || !firstUser.email) {
-    alert("No email address found. Please ensure the first user has an email address.")
+  const reportEmail = getReportEmail()
+  if (!reportEmail) {
+    alert("No email address configured. Please set up an email address in the Email Configuration section.")
     return
   }
 
@@ -179,8 +214,8 @@ async function emailAttendanceLogs(event) {
     
     // Send email using the composable
     const result = await sendEmail(
-      firstUser.email,
-      firstUser.name,
+      reportEmail,
+      'Admin',
       subject,
       emailBody
     )
@@ -227,5 +262,23 @@ function formatAttendanceForEmail() {
   
   emailContent += `\nReport generated on ${new Date().toLocaleString()}`
   return emailContent
+}
+
+function updateReportEmail() {
+  if (!newEmailAddress.value) {
+    alert('Please enter a valid email address.')
+    return
+  }
+  
+  setReportEmail(newEmailAddress.value)
+  newEmailAddress.value = ''
+  showEmailConfig.value = false
+  alert('Email address updated successfully!')
+}
+
+function resetEmailToFirstUser() {
+  resetToFirstUserEmail()
+  showEmailConfig.value = false
+  alert('Email reset to first user\'s email address.')
 }
 </script>
