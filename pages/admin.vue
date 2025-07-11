@@ -20,6 +20,7 @@
     <section class="mb-8">
       <h2 class="text-xl font-semibold mb-2">Registered Users</h2>
       <h2 class="text-xl font-semibold mb-2">Current User: {{ getCurrentUser()?.name || 'Not logged in' }}</h2>
+      <p class="text-sm text-gray-500">Debug - currentUser: {{ JSON.stringify(getCurrentUser()) }}</p>
       <!-- <h2 class="text-xl font-semibold mb-2">{{ temp }}</h2> -->
       <div v-if="filteredUsers.length" class="space-y-2">
         <div 
@@ -134,8 +135,10 @@ function handleImport(event) {
 }
 function handleDeleteUser(name) {
   const current = getCurrentUser()
+  console.log('Current user:', current)
+  console.log('Trying to delete:', name)
   
-  if (current && current.name == name) {
+  if (current && current.name === name) {
     alert("You cannot delete yourself. Use 'Delete All Users' to reset.")
     return
   }
