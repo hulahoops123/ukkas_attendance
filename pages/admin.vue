@@ -14,6 +14,8 @@
              class="border px-4 py-2 rounded cursor-pointer" />
       <button @click="confirmDeleteAllUsers"
               class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete All Users</button>
+      <button @click="emailAttendanceLogs"
+              class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Email Attendance</button>
     </div>
 
     <!-- USERS -->
@@ -153,5 +155,46 @@ function confirmDeleteAllUsers() {
   if (confirm("Are you sure you want to delete all users?")) {
     deleteAllUsers()
   }
+}
+
+function emailAttendanceLogs() {
+  const firstUser = users.value[0]
+  if (!firstUser || !firstUser.email) {
+    alert("No email address found. Please ensure the first user has an email address.")
+    return
+  }
+
+  // Format today's attendance logs for email
+  const emailBody = formatAttendanceForEmail()
+  const subject = `Attendance Report - ${new Date().toLocaleDateString()}`
+  
+  // Create mailto link
+  const mailtoLink = `mailto:${firstUser.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`
+  
+  // Open email client
+  window.location.href = mailtoLink
+}
+
+function formatAttendanceForEmail() {
+  const today = new Date().toLocaleDateString()
+  let emailContent = `Attendance Report for ${today}\n\n`
+  
+  if (Object.keys(todayLogs.value).length === 0) {
+    emailContent += "No attendance recorded today.\n"
+  } else {
+    for (const [key, logs] of Object.entries(todayLogs.value)) {
+      const employeeName = getEmployeeNameFromKey(key)
+      emailContent += `${employeeName}:\n`
+      
+      logs.forEach(log => {
+        const time = formatTime(log.time)
+        emailContent += `  - ${log.status} at ${time}\n`
+      })
+      emailContent += "\n"
+    }
+  }
+  
+  emailContent += `\nReport generated on ${new Date().toLocaleString()}`
+  return emailContent
 }
 </script>
