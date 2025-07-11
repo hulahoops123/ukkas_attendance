@@ -5,6 +5,8 @@
     <div class="flex flex-wrap gap-3 mb-6">
       <input v-model="searchQuery" placeholder="Search users..." 
              class="border px-3 py-1 rounded flex-1" />
+      <button @click="goToHome"
+              class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">← Back to Home</button>
       <button @click="goToAddUser"
               class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">+ Add User</button>
       <button @click="exportUsers"
@@ -137,6 +139,10 @@ function formatTime(iso) {
   if (!iso) return ''
   const d = new Date(iso)
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+function goToHome() {
+  router.push('/')
 }
 
 function goToAddUser() {
