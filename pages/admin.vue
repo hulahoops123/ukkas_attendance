@@ -2,24 +2,25 @@
   <div class="max-w-3xl mx-auto mt-10 p-4">
     <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-<div class="flex flex-wrap gap-3 mb-6">
-  <input v-model="searchQuery" placeholder="Search users..." 
-         class="border px-3 py-1 rounded flex-1" />
-  <button @click="goToAddUser"
-          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">+ Add User</button>
-  <button @click="exportUsers"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export Users</button>
-  <input type="file" accept=".json"
-         @change="handleImport"
-         class="border px-4 py-2 rounded cursor-pointer" />
-  <button @click="deleteAllUsers"
-          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete All Users</button>
-</div>
-
+    <div class="flex flex-wrap gap-3 mb-6">
+      <input v-model="searchQuery" placeholder="Search users..." 
+             class="border px-3 py-1 rounded flex-1" />
+      <button @click="goToAddUser"
+              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">+ Add User hula</button>
+      <button @click="exportUsers"
+              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export Users</button>
+      <input type="file" accept=".json"
+             @change="handleImport"
+             class="border px-4 py-2 rounded cursor-pointer" />
+      <button @click="confirmDeleteAllUsers"
+              class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete All Users</button>
+    </div>
 
     <!-- USERS -->
     <section class="mb-8">
-      <h2 class="text-xl font-semibold mb-2">Registered Users</h2>
+      <h2 class="text-xl font-semibold mb-2">Registered aUsers</h2>
+      <h2 class="text-xl font-semibold mb-2">{{ getCurrentUser() }}</h2>
+      <!-- <h2 class="text-xl font-semibold mb-2">{{ temp }}</h2> -->
       <div v-if="filteredUsers.length" class="space-y-2">
         <div 
           v-for="user in filteredUsers" :key="user.name" 
@@ -30,35 +31,34 @@
             <p class="text-sm text-gray-600">{{ user.email || 'No email' }}</p>
             <p v-if="user.isAdmin" class="text-xs text-purple-600 font-semibold">Admin</p>
           </div>
-          <button @click="deleteUser(user.name)"
-                  class="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
-            Delete
-          </button>
+<button @click="handleDeleteUser(user.name)"
+        class="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
+  Delete
+</button>
+
         </div>
       </div>
       <p v-else class="text-gray-600">No users registered yet.</p>
     </section>
 
     <!-- TODAY'S ATTENDANCE -->
-    
     <section>
-  <h2 class="text-xl font-semibold mb-2">Today’s Attendance Logs</h2>
-  <div v-if="Object.keys(todayLogs).length" class="space-y-4">
-    <div 
-      v-for="(logs, key) in todayLogs" :key="key"
-      class="border p-4 rounded"
-    >
-      <p class="font-bold mb-2">{{ getEmployeeNameFromKey(key) }}</p>
-      <ul class="list-disc ml-6 text-sm text-gray-700">
-        <li v-for="(log, index) in logs" :key="index">
-          {{ log.status }} at {{ formatTime(log.time) }}
-        </li>
-      </ul>
-    </div>
-  </div>
-  <p v-else class="text-gray-600">No attendance recorded today yet.</p>
-</section>
-
+      <h2 class="text-xl font-semibold mb-2">Today’s Attendance Logs</h2>
+      <div v-if="Object.keys(todayLogs).length" class="space-y-4">
+        <div 
+          v-for="(logs, key) in todayLogs" :key="key"
+          class="border p-4 rounded"
+        >
+          <p class="font-bold mb-2">{{ getEmployeeNameFromKey(key) }}</p>
+          <ul class="list-disc ml-6 text-sm text-gray-700">
+            <li v-for="(log, index) in logs" :key="index">
+              {{ log.status }} at {{ formatTime(log.time) }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <p v-else class="text-gray-600">No attendance recorded today yet.</p>
+    </section>
   </div>
 </template>
 
@@ -67,7 +67,7 @@ import { useRouter } from 'vue-router'
 import { useLocalDb } from '~/composables/useLocalDb'
 
 const router = useRouter()
-const { users, attendanceRefs, clearUsers } = useLocalDb()
+const { users, attendanceRefs, deleteUser, deleteAllUsers, currentUser, getCurrentUser } = useLocalDb()
 
 const searchQuery = ref('')
 
@@ -89,7 +89,6 @@ const todayLogs = computed(() => {
 })
 
 function getEmployeeNameFromKey(key) {
-  // "attendance:hula:2025-07-10" -> "hula"
   return key.split(':')[1]
 }
 
@@ -108,7 +107,7 @@ function exportUsers() {
   const downloadAnchor = document.createElement('a')
   downloadAnchor.setAttribute("href", dataStr)
   downloadAnchor.setAttribute("download", "users.json")
-  document.body.appendChild(downloadAnchor) // required for firefox
+  document.body.appendChild(downloadAnchor)
   downloadAnchor.click()
   downloadAnchor.remove()
 }
@@ -133,17 +132,23 @@ function handleImport(event) {
   }
   reader.readAsText(file)
 }
+function handleDeleteUser(name) {
+      console.log(getCurrentUser())
+      console.log(currentUser.value)
+  console.log('delete user called')
+  console.log("currentUser.value:", JSON.stringify(currentUser.value, null, 2))
+  console.log(`Comparing: ${currentUser.value?.name} === ${name}`)
 
-
-
-function deleteUser(name) {
-  users.value = users.value.filter(u => u.name !== name)
+  if (currentUser.value && currentUser.value.name === name) {
+    alert("You cannot delete yourself here. Use 'Delete All Users' to reset.")
+    return
+  }
+  deleteUser(name)
 }
 
-function deleteAllUsers() {
+function confirmDeleteAllUsers() {
   if (confirm("Are you sure you want to delete all users?")) {
-    clearUsers()
+    deleteAllUsers()
   }
 }
-console.log(todayLogs.value)
 </script>
