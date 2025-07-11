@@ -9,10 +9,7 @@ export default defineNuxtConfig({
     '@kevinmarrec/nuxt-pwa'
   ],
   devServer: {
-    https: process.env.NODE_ENV === 'development' && require('fs').existsSync('./localhost-key.pem') ? {
-      key: './localhost-key.pem',
-      cert: './localhost.pem'
-    } : false
+    https: true
   },
   pwa: {
     manifest: {
