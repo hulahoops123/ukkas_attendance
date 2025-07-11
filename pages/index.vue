@@ -17,9 +17,10 @@
     <!-- Confirmation modal -->
     <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white p-6 rounded shadow-lg text-center">
+        <h2>{{ currentUser.name }}</h2>
         <template v-if="matchedUser?.isAdmin">
           <p class="text-xl font-bold mb-2">
-            Hi {{ currentUserName }}, you’ll be {{ getNextAction(matchedUser) }} in {{ countdown }}s
+            Hi {{ currentUser.name }}, you’ll be {{ getNextAction(matchedUser) }} in {{ countdown }}s
           </p>
           <button @click="goToAdminDashboard" class="mt-2 px-4 py-2 bg-purple-600 text-white rounded">
             Go to Admin Dashboard
@@ -27,7 +28,7 @@
         </template>
         <template v-else>
           <p class="text-xl font-bold mb-4">
-            Hi {{ currentUserName }}, you’ve been {{ currentAction }}.
+            Hi {{ currentUser.name }}, you’ve been {{ currentAction }}.
           </p>
           <button @click="closeModal" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
             OK
@@ -45,14 +46,14 @@ import { useLocalDb } from '~/composables/useLocalDb'
 import * as faceapi from 'face-api.js'
 
 const router = useRouter()
-const { getAllUsers, addAttendanceLog, getCurrentStatus } = useLocalDb()
+const { getAllUsers, addAttendanceLog, getCurrentStatus, setCurrentUser, currentUser, getCurrentUser } = useLocalDb()
 
 const faceCam = ref(null)
 const showOverlay = ref(true)
 const cameraActive = ref(false)
 
 const showModal = ref(false)
-const currentUserName = ref('')
+// const currentUserName = ref('')
 const currentAction = ref('')
 const matchedUser = ref(null)
 
@@ -99,7 +100,17 @@ async function handleFaceFound() {
     if (user) {
       console.log(`Matched with ${user.name}`)
       matchedUser.value = user
-      currentUserName.value = user.name
+      // currentUserName.value = user.name
+      setCurrentUser({
+    name: user.name,
+    email: user.email,
+    pin: user.pin,
+    isAdmin: user.isAdmin
+  })
+      console.log(user)
+      console.log(getCurrentUser())
+      console.log(currentUser.value)
+      
 
       if (user.isAdmin) {
         showAdminModal(user)
