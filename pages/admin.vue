@@ -1,29 +1,53 @@
 <template>
-  <div class="max-w-3xl mx-auto mt-10 p-4">
-    <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div class="max-w-4xl mx-auto p-6">
+      <!-- Header with back button -->
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-4xl font-bold text-gray-800">Admin Dashboard</h1>
+        <button @click="goHome" 
+                class="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          Home
+        </button>
+      </div>
 
-    <div class="flex flex-wrap gap-3 mb-6">
-      <input v-model="searchQuery" placeholder="Search users..." 
-             class="border px-3 py-1 rounded flex-1" />
-      <button @click="goToAddUser"
-              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">+ Add User</button>
-      <button @click="exportUsers"
-              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export Users</button>
-      <input type="file" accept=".json"
-             @change="handleImport"
-             class="border px-4 py-2 rounded cursor-pointer" />
-      <button @click="confirmDeleteAllUsers"
-              class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete All Users</button>
-      <button @click="emailAttendanceLogs"
-              class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Email Attendance</button>
-    </div>
+      <!-- Action buttons -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div class="flex flex-wrap gap-3 mb-4">
+          <input v-model="searchQuery" placeholder="Search users..." 
+                 class="border-2 border-gray-200 px-4 py-2 rounded-lg flex-1 min-w-64 focus:border-blue-500 focus:outline-none transition-colors" />
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <button @click="goToAddUser"
+                  class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md">
+            + Add User
+          </button>
+          <button @click="exportUsers"
+                  class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-md">
+            Export Users
+          </button>
+          <input type="file" accept=".json"
+                 @change="handleImport"
+                 class="border-2 border-gray-200 px-4 py-3 rounded-lg cursor-pointer hover:border-gray-300 transition-colors" />
+          <button @click="confirmDeleteAllUsers"
+                  class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md">
+            Delete All Users
+          </button>
+          <button @click="emailAttendanceLogs"
+                  class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-semibold shadow-md">
+            Email Attendance
+          </button>
+        </div>
+      </div>
 
-    <!-- EMAIL CONFIGURATION -->
-    <section class="mb-8 border p-4 rounded bg-gray-50">
+      <!-- EMAIL CONFIGURATION -->
+      <section class="mb-8 bg-white rounded-xl shadow-lg p-6">
       <div class="flex items-center justify-between mb-3">
         <h2 class="text-xl font-semibold">Email Configuration</h2>
         <button @click="showEmailConfig = !showEmailConfig"
-                class="text-blue-600 hover:text-blue-800 text-sm">
+                class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium">
           {{ showEmailConfig ? 'Hide' : 'Configure' }}
         </button>
       </div>
@@ -34,25 +58,25 @@
       </div>
 
       <div v-if="showEmailConfig" class="space-y-3">
-        <div class="flex gap-2">
+        <div class="flex gap-3">
           <input v-model="newEmailAddress" 
                  type="email"
                  placeholder="Enter custom email address"
-                 class="border px-3 py-2 rounded flex-1" />
+                 class="border-2 border-gray-200 px-4 py-2 rounded-lg flex-1 focus:border-blue-500 focus:outline-none transition-colors" />
           <button @click="updateReportEmail"
-                  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                  class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
             Set Custom Email
           </button>
         </div>
         <button @click="resetEmailToFirstUser"
-                class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700">
+                class="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-700 transition-colors font-medium">
           Reset to First User's Email
         </button>
       </div>
     </section>
 
-    <!-- USERS -->
-    <section class="mb-8">
+      <!-- USERS -->
+      <section class="mb-8 bg-white rounded-xl shadow-lg p-6">
       <h2 class="text-xl font-semibold mb-2">
         {{ searchQuery ? `Searching for '${searchQuery}'` : 'Registered Users' }}
       </h2>
@@ -61,35 +85,34 @@
       <div v-if="filteredUsers.length" class="space-y-2">
         <div 
           v-for="user in filteredUsers" :key="user.name" 
-          class="border p-3 rounded flex justify-between items-center"
+          class="border-2 border-gray-100 p-4 rounded-lg flex justify-between items-center hover:border-gray-200 transition-colors"
         >
           <div>
-            <p class="font-bold">{{ user.name }}</p>
+            <p class="font-bold text-lg text-gray-800">{{ user.name }}</p>
             <p class="text-sm text-gray-600">{{ user.email || 'No email' }}</p>
-            <p v-if="user.isAdmin" class="text-xs text-purple-600 font-semibold">Admin</p>
+            <p v-if="user.isAdmin" class="text-xs text-purple-600 font-semibold bg-purple-100 px-2 py-1 rounded-full inline-block mt-1">Admin</p>
           </div>
-<button @click="handleDeleteUser(user.name)"
-        class="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
-  Delete
-</button>
-
+          <button @click="handleDeleteUser(user.name)"
+                  class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium shadow-md">
+            Delete
+          </button>
         </div>
       </div>
       <p v-else class="text-gray-600">No users registered yet.</p>
     </section>
 
-    <!-- TODAY'S ATTENDANCE -->
-    <section>
+      <!-- TODAY'S ATTENDANCE -->
+      <section class="bg-white rounded-xl shadow-lg p-6">
       <h2 class="text-xl font-semibold mb-2">Today’s Attendance Logs</h2>
       <div v-if="Object.keys(todayLogs).length" class="space-y-4">
         <div 
           v-for="(logs, key) in todayLogs" :key="key"
-          class="border p-4 rounded"
+          class="border-2 border-gray-100 p-4 rounded-lg hover:border-gray-200 transition-colors"
         >
-          <p class="font-bold mb-2">{{ getEmployeeNameFromKey(key) }}</p>
-          <ul class="list-disc ml-6 text-sm text-gray-700">
-            <li v-for="(log, index) in logs" :key="index">
-              {{ log.status }} at {{ formatTime(log.time) }}
+          <p class="font-bold mb-3 text-lg text-gray-800">{{ getEmployeeNameFromKey(key) }}</p>
+          <ul class="space-y-1">
+            <li v-for="(log, index) in logs" :key="index" class="text-sm text-gray-700 bg-gray-50 px-3 py-2 rounded">
+              <span class="font-medium">{{ log.status }}</span> at {{ formatTime(log.time) }}
             </li>
           </ul>
         </div>
@@ -141,6 +164,10 @@ function formatTime(iso) {
 
 function goToAddUser() {
   router.push('/adduser')
+}
+
+function goHome() {
+  router.push('/')
 }
 
 function exportUsers() {
