@@ -25,3 +25,4 @@ logs
 # Ignore Service Worker
 sw.*
 
+.aider*
