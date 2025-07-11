@@ -6,7 +6,7 @@
       <input v-model="searchQuery" placeholder="Search users..." 
              class="border px-3 py-1 rounded flex-1" />
       <button @click="goToAddUser"
-              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">+ Add User hula</button>
+              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">+ Add User</button>
       <button @click="exportUsers"
               class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export Users</button>
       <input type="file" accept=".json"
@@ -18,7 +18,7 @@
 
     <!-- USERS -->
     <section class="mb-8">
-      <h2 class="text-xl font-semibold mb-2">Registered aUsers</h2>
+      <h2 class="text-xl font-semibold mb-2">Registered Users</h2>
       <h2 class="text-xl font-semibold mb-2">{{ getCurrentUser() }}</h2>
       <!-- <h2 class="text-xl font-semibold mb-2">{{ temp }}</h2> -->
       <div v-if="filteredUsers.length" class="space-y-2">
@@ -133,17 +133,16 @@ function handleImport(event) {
   reader.readAsText(file)
 }
 function handleDeleteUser(name) {
-      console.log(getCurrentUser())
-      console.log(currentUser.value)
-  console.log('delete user called')
-  console.log("currentUser.value:", JSON.stringify(currentUser.value, null, 2))
-  console.log(`Comparing: ${currentUser.value?.name} === ${name}`)
-
-  if (currentUser.value && currentUser.value.name === name) {
-    alert("You cannot delete yourself here. Use 'Delete All Users' to reset.")
+  const current = getCurrentUser()
+  
+  if (current && current.name === name) {
+    alert("You cannot delete yourself. Use 'Delete All Users' to reset.")
     return
   }
-  deleteUser(name)
+  
+  if (confirm(`Are you sure you want to delete user "${name}"?`)) {
+    deleteUser(name)
+  }
 }
 
 function confirmDeleteAllUsers() {
