@@ -1,10 +1,18 @@
 export function useEmail() {
-  // EmailJS configuration - you'll need to set these up in your EmailJS account
-  const SERVICE_ID = 'your_service_id'
-  const TEMPLATE_ID = 'your_template_id' 
-  const PUBLIC_KEY = 'your_public_key'
+  // EmailJS configuration
+  const SERVICE_ID = 'service_yyzqiep'
+  const TEMPLATE_ID = 'template_k48p3di' 
+  const PUBLIC_KEY = 'your_public_key' // You still need to get your public key from EmailJS
 
   async function sendEmail(to_email, to_name, subject, message) {
+    // Check if we have all required credentials
+    if (PUBLIC_KEY === 'your_public_key') {
+      console.warn('EmailJS public key not configured, falling back to mailto')
+      const mailtoLink = `mailto:${to_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`
+      window.location.href = mailtoLink
+      return { success: true, fallback: true }
+    }
+
     try {
       // Try to import EmailJS
       const { default: emailjs } = await import('@emailjs/browser')
@@ -24,6 +32,7 @@ export function useEmail() {
         PUBLIC_KEY
       )
 
+      console.log('Email sent successfully:', response)
       return { success: true, response }
     } catch (error) {
       console.error('Email send failed:', error)
