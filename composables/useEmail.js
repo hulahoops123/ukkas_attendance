@@ -2,7 +2,7 @@ export function useEmail() {
   // EmailJS configuration
   const SERVICE_ID = 'service_yyzqiep'
   const TEMPLATE_ID = 'template_k48p3di' 
-  const PUBLIC_KEY = 'your_public_key' // You still need to get your public key from EmailJS
+  const PUBLIC_KEY = 'ae8r1L_Oo_pWaOJTW'
 
   async function sendEmail(to_email, to_name, subject, message) {
     // Check if we have all required credentials
