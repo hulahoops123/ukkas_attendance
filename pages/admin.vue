@@ -135,8 +135,10 @@ function handleImport(event) {
 }
 function handleDeleteUser(name) {
   const current = getCurrentUser()
-  console.log('Current user:', current)
+  console.log('Current user:', JSON.stringify(current))
+  console.log('Current user name:', current?.name)
   console.log('Trying to delete:', name)
+  console.log('Names match:', current?.name === name)
   
   if (current && current.name === name) {
     alert("You cannot delete yourself. Use 'Delete All Users' to reset.")
