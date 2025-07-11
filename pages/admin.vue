@@ -19,7 +19,7 @@
     <!-- USERS -->
     <section class="mb-8">
       <h2 class="text-xl font-semibold mb-2">Registered Users</h2>
-      <h2 class="text-xl font-semibold mb-2">{{ getCurrentUser() }}</h2>
+      <h2 class="text-xl font-semibold mb-2">Current User: {{ getCurrentUser()?.name || 'Not logged in' }}</h2>
       <!-- <h2 class="text-xl font-semibold mb-2">{{ temp }}</h2> -->
       <div v-if="filteredUsers.length" class="space-y-2">
         <div 
