@@ -69,7 +69,6 @@
           </button>
         </template>
       </div>
-      </section>
     </div>
   </div>
 </template>
