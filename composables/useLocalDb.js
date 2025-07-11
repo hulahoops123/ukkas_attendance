@@ -27,6 +27,26 @@ export function useLocalDb() {
     return users.value.find(user => user.isAdmin)
   }
 
+function deleteUser(name) {
+  users.value = users.value.filter(u => u.name !== name)
+}
+
+function deleteAllUsers() {
+  users.value = []
+}
+
+
+const currentUser = useStorage('currentUser', null)
+
+function setCurrentUser(user) {
+  currentUser.value = user
+}
+
+function getCurrentUser() {
+  return currentUser.value
+}
+
+
   // === ATTENDANCE ===
  const attendanceRefs = useStorage('attendanceRefs', {}) // one object with all days & users
 
@@ -71,6 +91,11 @@ export function useLocalDb() {
     findMatchingUser,
     hasAdmin,
     getAdmin,
+    deleteUser,
+    deleteAllUsers,
+      currentUser,
+  setCurrentUser,
+  getCurrentUser,
 
     // attendance
     attendanceRefs,
