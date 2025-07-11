@@ -36,7 +36,7 @@ function deleteAllUsers() {
 }
 
 
-const currentUser = useStorage('currentUser', null, localStorage, {
+const currentUser = useStorage('currentUser', null, undefined, {
   serializer: {
     read: (value) => {
       try {
