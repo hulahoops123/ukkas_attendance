@@ -8,6 +8,12 @@ export default defineNuxtConfig({
     'nuxt-icon',
     '@kevinmarrec/nuxt-pwa'
   ],
+  devServer: {
+    https: {
+      key: './localhost-key.pem',
+      cert: './localhost.pem'
+    }
+  },
   pwa: {
     manifest: {
       name: "HSQUAD PB",
