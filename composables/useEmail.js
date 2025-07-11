@@ -6,6 +6,7 @@ export function useEmail() {
 
   async function sendEmail(to_email, to_name, subject, message) {
     try {
+      // Try to import EmailJS
       const { default: emailjs } = await import('@emailjs/browser')
       
       const templateParams = {
@@ -26,7 +27,12 @@ export function useEmail() {
       return { success: true, response }
     } catch (error) {
       console.error('Email send failed:', error)
-      return { success: false, error }
+      
+      // Fallback to mailto if EmailJS fails
+      const mailtoLink = `mailto:${to_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`
+      window.location.href = mailtoLink
+      
+      return { success: true, fallback: true }
     }
   }
 
