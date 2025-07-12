@@ -17,6 +17,7 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { reactive, onMounted, onUnmounted } from 'vue'
 
@@ -34,11 +35,11 @@ const letters = [
 
 const positions = reactive(letters.map(l => ({ x: l.x, y: l.y })))
 const velocities = reactive(letters.map(() => ({ 
-  vx: (Math.random() - 0.5) * 1,
-  vy: (Math.random() - 0.5) * 1
+  vx: (Math.random() - 0.5) * 0.4, // reduced from *1
+  vy: (Math.random() - 0.5) * 0.4
 })))
 const angles = reactive(letters.map(() => 0))
-const rotationVelocities = reactive(letters.map(() => (Math.random() - 0.5) * 2))
+const rotationVelocities = reactive(letters.map(() => (Math.random() - 0.5) * 1)) // reduced from *2
 
 let animationId = null
 let isAnimating = false
@@ -64,9 +65,9 @@ function startCycle() {
     if (elapsed >= CYCLE_DURATION) {
       startTime = currentTime
       letters.forEach((_, i) => {
-        velocities[i].vx = (Math.random() - 0.5) * 1
-        velocities[i].vy = (Math.random() - 0.5) * 1
-        rotationVelocities[i] = (Math.random() - 0.5) * 2
+        velocities[i].vx = (Math.random() - 0.5) * 0.4
+        velocities[i].vy = (Math.random() - 0.5) * 0.4
+        rotationVelocities[i] = (Math.random() - 0.5) * 1
       })
     }
 
@@ -77,34 +78,32 @@ function startCycle() {
         positions[i].y += velocities[i].vy
         angles[i] += rotationVelocities[i]
         
-        // Apply gentle damping to slow things down
-        velocities[i].vx *= 0.999
-        velocities[i].vy *= 0.999
-        rotationVelocities[i] *= 0.998
+        velocities[i].vx *= 0.995 // more damping
+        velocities[i].vy *= 0.995
+        rotationVelocities[i] *= 0.995
 
-        // Bounce left/right
+        // Bounce
         if (positions[i].x <= -window.innerWidth/2 + LETTER_SIZE/2) {
           positions[i].x = -window.innerWidth/2 + LETTER_SIZE/2
           velocities[i].vx = Math.abs(velocities[i].vx)
-          rotationVelocities[i] += (Math.random() - 0.5) * 2
+          rotationVelocities[i] += (Math.random() - 0.5) * 1.5
         } else if (positions[i].x >= window.innerWidth/2 - LETTER_SIZE/2) {
           positions[i].x = window.innerWidth/2 - LETTER_SIZE/2
           velocities[i].vx = -Math.abs(velocities[i].vx)
-          rotationVelocities[i] += (Math.random() - 0.5) * 2
+          rotationVelocities[i] += (Math.random() - 0.5) * 1.5
         }
 
-        // Bounce top/bottom
         if (positions[i].y <= -window.innerHeight/2 + LETTER_SIZE/2) {
           positions[i].y = -window.innerHeight/2 + LETTER_SIZE/2
           velocities[i].vy = Math.abs(velocities[i].vy)
-          rotationVelocities[i] += (Math.random() - 0.5) * 2
+          rotationVelocities[i] += (Math.random() - 0.5) * 1.5
         } else if (positions[i].y >= window.innerHeight/2 - LETTER_SIZE/2) {
           positions[i].y = window.innerHeight/2 - LETTER_SIZE/2
           velocities[i].vy = -Math.abs(velocities[i].vy)
-          rotationVelocities[i] += (Math.random() - 0.5) * 2
+          rotationVelocities[i] += (Math.random() - 0.5) * 1.5
         }
 
-        // Check collisions with other letters
+        // Collisions
         for (let j = i + 1; j < letters.length; j++) {
           const dx = positions[i].x - positions[j].x
           const dy = positions[i].y - positions[j].y
@@ -112,18 +111,15 @@ function startCycle() {
           const minDistance = LETTER_SIZE
 
           if (distance < minDistance && distance > 0) {
-            // Calculate collision response
             const overlap = minDistance - distance
             const separationX = (dx / distance) * overlap * 0.5
             const separationY = (dy / distance) * overlap * 0.5
 
-            // Separate the letters
             positions[i].x += separationX
             positions[i].y += separationY
             positions[j].x -= separationX
             positions[j].y -= separationY
 
-            // Calculate new velocities (elastic collision)
             const normalX = dx / distance
             const normalY = dy / distance
             
@@ -132,23 +128,22 @@ function startCycle() {
             
             const velocityAlongNormal = relativeVelocityX * normalX + relativeVelocityY * normalY
             
-            if (velocityAlongNormal > 0) continue // Objects separating
+            if (velocityAlongNormal > 0) continue
             
-            const restitution = 0.3 // Bounce factor (lower = less bouncy)
-            const impulse = -(1 + restitution) * velocityAlongNormal
+            const restitution = 0.1 // less bouncy
+            const impulse = -(1 + restitution) * velocityAlongNormal * 0.5 // extra damp
             
             velocities[i].vx += impulse * normalX
             velocities[i].vy += impulse * normalY
             velocities[j].vx -= impulse * normalX
             velocities[j].vy -= impulse * normalY
 
-            // Add some gentle random rotation on collision
-            rotationVelocities[i] += (Math.random() - 0.5) * 3
-            rotationVelocities[j] += (Math.random() - 0.5) * 3
+            rotationVelocities[i] += (Math.random() - 0.5) * 1.5
+            rotationVelocities[j] += (Math.random() - 0.5) * 1.5
           }
         }
       } else {
-        // Return phase
+        // Return to original positions
         const returnProgress = (elapsed - RETURN_START_TIME) / (CYCLE_DURATION - RETURN_START_TIME)
         const easeProgress = 1 - Math.pow(1 - returnProgress, 3)
 
@@ -198,4 +193,3 @@ onUnmounted(() => {
   stopAnimation()
 })
 </script>
-

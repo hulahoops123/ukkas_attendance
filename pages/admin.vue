@@ -92,8 +92,8 @@
     </section>
 
     <!-- TODAY'S ATTENDANCE -->
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Today’s Attendance Logs</h2>
+        <section class="bg-white bg-opacity-90 p-4 rounded-lg">
+      <h2 class="text-xl font-semibold mb-2">Today's Attendance Logs</h2>
       <div v-if="Object.keys(todayLogs).length" class="space-y-4">
         <div 
           v-for="(logs, key) in todayLogs" :key="key"
@@ -109,6 +109,7 @@
       </div>
       <p v-else class="text-gray-600">No attendance recorded today yet.</p>
     </section>
+
   </div>
 </template>
 
