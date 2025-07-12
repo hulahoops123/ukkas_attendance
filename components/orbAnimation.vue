@@ -47,11 +47,15 @@ const velocities = reactive(
 
 let animationId = null
 let isAnimating = false
+let startTime = null
 const LETTER_SIZE = 80 // approximate size of letters including padding
+const CYCLE_DURATION = 20000 // 20 seconds in milliseconds
+const RETURN_START_TIME = 15000 // Start returning at 15 seconds
 
-function startBouncing() {
+function startCycle() {
   if (isAnimating) return
   isAnimating = true
+  startTime = Date.now()
   
   // Set initial random positions within bounds
   letters.forEach((_, i) => {
@@ -60,27 +64,67 @@ function startBouncing() {
   })
   
   function animate() {
-    letters.forEach((_, i) => {
-      // Update positions
-      positions[i].x += velocities[i].vx
-      positions[i].y += velocities[i].vy
-      
-      // Bounce off left and right walls
-      if (positions[i].x <= -window.innerWidth/2 + LETTER_SIZE/2) {
-        positions[i].x = -window.innerWidth/2 + LETTER_SIZE/2
-        velocities[i].vx = Math.abs(velocities[i].vx)
-      } else if (positions[i].x >= window.innerWidth/2 - LETTER_SIZE/2) {
-        positions[i].x = window.innerWidth/2 - LETTER_SIZE/2
-        velocities[i].vx = -Math.abs(velocities[i].vx)
-      }
-      
-      // Bounce off top and bottom walls
-      if (positions[i].y <= -window.innerHeight/2 + LETTER_SIZE/2) {
-        positions[i].y = -window.innerHeight/2 + LETTER_SIZE/2
-        velocities[i].vy = Math.abs(velocities[i].vy)
-      } else if (positions[i].y >= window.innerHeight/2 - LETTER_SIZE/2) {
-        positions[i].y = window.innerHeight/2 - LETTER_SIZE/2
-        velocities[i].vy = -Math.abs(velocities[i].vy)
+    const currentTime = Date.now()
+    const elapsed = currentTime - startTime
+    
+    if (elapsed >= CYCLE_DURATION) {
+      // Cycle complete, start new cycle
+      startTime = currentTime
+      // Reset velocities for new cycle
+      letters.forEach((_, i) => {
+        velocities[i].vx = (Math.random() - 0.5) * 4
+        velocities[i].vy = (Math.random() - 0.5) * 4
+      })
+    }
+    
+    letters.forEach((letter, i) => {
+      if (elapsed < RETURN_START_TIME) {
+        // Normal bouncing phase (0-15 seconds)
+        positions[i].x += velocities[i].vx
+        positions[i].y += velocities[i].vy
+        
+        // Bounce off left and right walls
+        if (positions[i].x <= -window.innerWidth/2 + LETTER_SIZE/2) {
+          positions[i].x = -window.innerWidth/2 + LETTER_SIZE/2
+          velocities[i].vx = Math.abs(velocities[i].vx)
+        } else if (positions[i].x >= window.innerWidth/2 - LETTER_SIZE/2) {
+          positions[i].x = window.innerWidth/2 - LETTER_SIZE/2
+          velocities[i].vx = -Math.abs(velocities[i].vx)
+        }
+        
+        // Bounce off top and bottom walls
+        if (positions[i].y <= -window.innerHeight/2 + LETTER_SIZE/2) {
+          positions[i].y = -window.innerHeight/2 + LETTER_SIZE/2
+          velocities[i].vy = Math.abs(velocities[i].vy)
+        } else if (positions[i].y >= window.innerHeight/2 - LETTER_SIZE/2) {
+          positions[i].y = window.innerHeight/2 - LETTER_SIZE/2
+          velocities[i].vy = -Math.abs(velocities[i].vy)
+        }
+      } else {
+        // Return phase (15-20 seconds) - smoothly interpolate back to original
+        const returnProgress = (elapsed - RETURN_START_TIME) / (CYCLE_DURATION - RETURN_START_TIME)
+        const easeProgress = 1 - Math.pow(1 - returnProgress, 3) // ease-out cubic
+        
+        // Store current position at start of return phase
+        if (elapsed === RETURN_START_TIME || Math.abs(elapsed - RETURN_START_TIME) < 16) {
+          if (!positions[i].returnStartX) {
+            positions[i].returnStartX = positions[i].x
+            positions[i].returnStartY = positions[i].y
+          }
+        }
+        
+        // Interpolate from return start position to original position
+        const startX = positions[i].returnStartX || positions[i].x
+        const startY = positions[i].returnStartY || positions[i].y
+        
+        positions[i].x = startX + (letter.x - startX) * easeProgress
+        positions[i].y = startY + (letter.y - startY) * easeProgress
+        
+        // Clean up return start positions at end of cycle
+        if (elapsed >= CYCLE_DURATION - 16) {
+          delete positions[i].returnStartX
+          delete positions[i].returnStartY
+        }
       }
     })
     
@@ -92,37 +136,12 @@ function startBouncing() {
   animate()
 }
 
-function stopBouncing() {
+function stopAnimation() {
   isAnimating = false
   if (animationId) {
     cancelAnimationFrame(animationId)
     animationId = null
   }
-}
-
-function returnToOriginal() {
-  stopBouncing()
-  
-  // Smoothly return to original positions
-  letters.forEach((l, i) => {
-    positions[i].x = l.x
-    positions[i].y = l.y
-  })
-}
-
-function startCycle() {
-  // Start bouncing animation
-  startBouncing()
-  
-  // After 15 seconds, return to original for 5 seconds
-  setTimeout(() => {
-    returnToOriginal()
-    
-    // After 5 seconds at original position, start next cycle
-    setTimeout(() => {
-      startCycle()
-    }, 5000)
-  }, 15000)
 }
 
 onMounted(() => {
@@ -133,7 +152,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  stopBouncing()
+  stopAnimation()
 })
 </script>
 
