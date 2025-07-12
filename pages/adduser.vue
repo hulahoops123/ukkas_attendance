@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
     <div class="container mx-auto px-6 py-8">
-      <!-- Header with back button -->
       <div class="flex items-center justify-between mb-8">
         <h1 class="text-4xl font-bold text-gray-800">Add New User</h1>
         <button @click="goHome" 
@@ -14,7 +13,6 @@
       </div>
 
       <div class="flex flex-col items-center">
-        <!-- STEP 1: FACE CAPTURE -->
         <div v-if="step === 1" class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
           <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Step 1: Face Recognition Setup</h2>
           <p class="text-gray-600 text-center mb-6">Position your face in the camera and capture 5 photos for recognition</p>
@@ -30,7 +28,6 @@
               {{ faceInFrame ? `Capture Face (${captures}/5)` : 'Position your face in frame' }}
             </button>
             
-            <!-- Progress indicator -->
             <div class="mt-4 flex gap-2">
               <div v-for="i in 5" :key="i" 
                    :class="i <= captures ? 'bg-blue-600' : 'bg-gray-200'"
@@ -39,7 +36,6 @@
           </div>
         </div>
 
-        <!-- STEP 2: SET NAME + PIN + EMAIL -->
         <div v-else-if="step === 2" class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
           <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Step 2: User Information</h2>
           <p class="text-gray-600 text-center mb-6">Enter your details to complete registration</p>
@@ -78,7 +74,6 @@
           </div>
         </div>
 
-        <!-- STEP 3: DONE -->
         <div v-else class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
           <div class="mb-6">
             <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
