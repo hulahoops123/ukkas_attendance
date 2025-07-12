@@ -3,7 +3,7 @@
     <div
       v-for="(letter, index) in letters"
       :key="index"
-      class="absolute font-bold text-6xl transition-transform duration-700 ease-in-out"
+      class="absolute font-bold text-6xl transition-transform duration-[2000ms] ease-in-out"
       :class="[
         letter.circle ? 'w-20 h-20 rounded-full flex items-center justify-center' : '',
       ]"
@@ -45,19 +45,19 @@ function scatterAndReturn() {
     positions[i].y = (Math.random() - 0.5) * 600
   })
 
-  // after 1 second, return to original
+  // after 3 seconds, return to original
   setTimeout(() => {
     letters.forEach((l, i) => {
       positions[i].x = l.x
       positions[i].y = l.y
     })
-  }, 1000)
+  }, 3000)
 }
 
 onMounted(() => {
   setInterval(() => {
     scatterAndReturn()
-  }, 3000)
+  }, 8000)
 })
 </script>
 
