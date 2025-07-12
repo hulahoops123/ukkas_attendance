@@ -187,7 +187,10 @@ async function handleFaceFound() {
 
 function handleFaceLost() {
   // console.log("Face lost")
-  startInactivityTimeout()
+  // Only start timeout if not already running
+  if (!cameraInactivityTimer.value) {
+    startInactivityTimeout()
+  }
 }
 
 function showNoMatchModal() {
