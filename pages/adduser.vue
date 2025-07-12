@@ -47,13 +47,13 @@
                      class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
             </div>
             
-            <div>
+            <div v-if="!hasAdmin()">
               <label class="block text-sm font-medium text-gray-700 mb-2">PIN</label>
               <input v-model="pin" type="password" placeholder="Create a PIN" 
                      class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
             </div>
             
-            <div>
+            <div v-if="!hasAdmin()">
               <label class="block text-sm font-medium text-gray-700 mb-2">Confirm PIN</label>
               <input v-model="pinConfirm" type="password" placeholder="Confirm your PIN" 
                      class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
@@ -136,23 +136,29 @@ function saveUser() {
     pinError.value = "Name cannot be empty."
     return
   }
-  if (!pin.value || !pinConfirm.value) {
-    pinError.value = "PIN fields cannot be empty."
-    return
+  
+  const isFirstAdmin = !hasAdmin()
+  
+  // Only validate PIN for first admin user
+  if (isFirstAdmin) {
+    if (!pin.value || !pinConfirm.value) {
+      pinError.value = "PIN fields cannot be empty."
+      return
+    }
+    if (pin.value !== pinConfirm.value) {
+      pinError.value = "PINs do not match."
+      return
+    }
   }
-  if (pin.value !== pinConfirm.value) {
-    pinError.value = "PINs do not match."
-    return
-  }
+  
   if (!email.value || !/.+@.+\..+/.test(email.value)) {
     pinError.value = "Please enter a valid email address."
     return
   }
 
-  const isFirstAdmin = !hasAdmin()
   addUser({
     name: userName.value,
-    pin: pin.value,
+    pin: isFirstAdmin ? pin.value : null,
     email: email.value,
     descriptors,
     isAdmin: isFirstAdmin
