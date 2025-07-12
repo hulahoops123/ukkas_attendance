@@ -31,14 +31,14 @@
         class="rounded shadow-lg w-full"
       />
 
-      <div v-if="cameraActive && !showModal" class="bg-black bg-opacity-75 text-white px-6 py-4 rounded-lg shadow w-full">
-        <h3 class="text-lg font-semibold mb-3 text-blue-300">Face Recognition Active</h3>
-        <div class="space-y-2 text-sm">
-          <p class="flex items-center"><span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>Stand still and look directly at the camera</p>
-          <p class="flex items-center"><span class="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>Keep your face well-lit and visible</p>
-          <p class="flex items-center"><span class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>Wait for recognition to complete</p>
+      <div v-if="cameraActive && !showModal" class="bg-black bg-opacity-50 text-white px-6 py-4 rounded-lg shadow w-full">
+        <h3 class="text-xl font-semibold mb-3 text-blue-300">Face Recognition Active</h3>
+        <div class="space-y-3 text-base">
+          <p class="flex items-center"><span class="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>Stand still and look directly at the camera</p>
+          <p class="flex items-center"><span class="w-3 h-3 bg-blue-400 rounded-full mr-3"></span>Keep your face well-lit and visible</p>
+          <p class="flex items-center"><span class="w-3 h-3 bg-yellow-400 rounded-full mr-3"></span>Wait for recognition to complete</p>
         </div>
-        <div class="mt-2 text-xs text-gray-300">Auto-return to idle in {{ remainingIdleTime }}s</div>
+        <div class="mt-3 text-sm text-gray-300">Auto-return to idle in {{ remainingIdleTime }}s</div>
       </div>
 
       <button v-if="cameraActive && !showModal"
