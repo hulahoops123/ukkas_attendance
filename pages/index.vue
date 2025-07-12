@@ -3,8 +3,7 @@
     <div v-if="showOverlay"
       class="absolute inset-0 bg-black flex items-center justify-center text-3xl font-bold text-black z-50 h-screen w-screen"
       @click="startCamera">
-      <OrbAnimation></OrbAnimation>
-      <p class="text-white">Press to Start</p>
+      <OrbAnimation class="border-8 border-pink-600"></OrbAnimation>
     </div>
 
     <FaceCamera v-if="cameraActive" @faceFound="handleFaceFound" @faceLost="handleFaceLost" ref="faceCam" />
