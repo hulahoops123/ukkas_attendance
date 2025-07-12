@@ -13,7 +13,7 @@
       <span class="ball"></span>
       <span class="ball"></span>
     </div>
-    <h1 class="text-4xl font-bold text-gray-200 mt-8 mb-6">Therapist Attendance System</h1>
+    <h1 class="text-3xl font-bold text-gray-200 mt-8 mb-6">Therapist Attendance</h1>
 
     <div class="flex flex-col items-center space-y-6 w-full max-w-md">
 
