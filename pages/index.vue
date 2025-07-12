@@ -1,23 +1,19 @@
 <template>
-  <div class="flex flex-col items-center mt-10 relative">
+  <div class="flex flex-col items-center mt-10 relative bg-transparent">
     <div v-if="showOverlay"
-      class="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center text-3xl font-bold text-black z-50"
+      class="absolute inset-0 bg-black flex items-center justify-center text-3xl font-bold text-black z-50 h-screen w-screen"
       @click="startCamera">
-      👆 Tap to start camera
+      <OrbAnimation></OrbAnimation>
+      <p class="text-white">Press to Start</p>
     </div>
 
-<FaceCamera
-  v-if="cameraActive"
-  @faceFound="handleFaceFound"
-  @faceLost="handleFaceLost"
-  ref="faceCam"
-/>
+    <FaceCamera v-if="cameraActive" @faceFound="handleFaceFound" @faceLost="handleFaceLost" ref="faceCam" />
 
 
-<button v-if="cameraActive && !showModal" @click="backToIdle"
-  class="absolute top-4 right-4 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 z-40">
-  ← Back to Idle ({{ remainingIdleTime }}s)
-</button>
+    <button v-if="cameraActive && !showModal" @click="backToIdle"
+      class="absolute top-4 right-4 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 z-40">
+      ← Back to Idle ({{ remainingIdleTime }}s)
+    </button>
 
     <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white p-6 rounded shadow-lg text-center">
@@ -111,7 +107,7 @@ function startInactivityTimeout() {
       clearInterval(inactivityInterval.value)
     }
   }, 1000)
-  
+
   // Start the first countdown tick immediately
   setTimeout(() => {
     if (remainingIdleTime.value > 0) {
@@ -123,7 +119,7 @@ function startInactivityTimeout() {
 
 function clearInactivityTimeout() {
   clearTimeout(cameraInactivityTimer.value)
-    clearInterval(inactivityInterval.value)
+  clearInterval(inactivityInterval.value)
 }
 
 function startNoMatchAutoClose() {
@@ -164,7 +160,7 @@ async function handleFaceFound() {
       console.log(`Matched with ${user.name}`)
       matchedUser.value = user
       currentUserName.value = user.name
-      
+
       // Set the current user so they're properly logged in
       setCurrentUser(user)
 
