@@ -2,20 +2,16 @@
 
 <template>
 <div class="min-h-screen w-full bg-gray-800 flex flex-col items-center px-4">
-    <!-- Heading -->
     <h1 class="text-4xl font-bold text-gray-200 mt-8 mb-6">Therapist Attendance System</h1>
 
-    <!-- Main content stack -->
     <div class="flex flex-col items-center space-y-6 w-full max-w-md">
 
-      <!-- Overlay to start camera -->
       <div v-if="showOverlay"
         class="fixed inset-0 bg-black flex items-center justify-center text-3xl font-bold text-black z-50"
         @click="startCamera">
         <OrbAnimation class="border-8 border-pink-600"></OrbAnimation>
       </div>
 
-      <!-- Camera feed -->
       <FaceCamera
         v-if="cameraActive"
         @faceFound="handleFaceFound"
@@ -24,7 +20,6 @@
         class="rounded shadow-lg w-full"
       />
 
-      <!-- Instructions -->
       <div v-if="cameraActive && !showModal" class="bg-black bg-opacity-75 text-white px-6 py-4 rounded-lg shadow w-full">
         <h3 class="text-lg font-semibold mb-3 text-blue-300">Face Recognition Active</h3>
         <div class="space-y-2 text-sm">
@@ -35,7 +30,6 @@
         <div class="mt-2 text-xs text-gray-300">Auto-return to idle in {{ remainingIdleTime }}s</div>
       </div>
 
-      <!-- Back to Idle -->
       <button v-if="cameraActive && !showModal"
         @click="backToIdle"
         class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-full">
@@ -43,11 +37,9 @@
       </button>
     </div>
 
-    <!-- Modal -->
     <div v-if="showModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white p-6 rounded shadow-lg text-center w-80">
-        <!-- Admin modal -->
         <template v-if="matchedUser?.isAdmin">
           <p class="text-xl font-bold mb-2">
             Hi {{ currentUserName }}, you’ll be {{ getNextAction(matchedUser) }} in {{ countdown }}s
@@ -58,7 +50,6 @@
           </button>
         </template>
 
-        <!-- Normal user -->
         <template v-else-if="matchedUser">
           <p class="text-xl font-bold mb-4">
             Hi {{ currentUserName }}, you’ve been {{ currentAction }}.
@@ -69,7 +60,6 @@
           </button>
         </template>
 
-        <!-- No match -->
         <template v-else>
           <p class="text-xl font-bold mb-4">
             <span v-if="noMatchAttempts < 3">
