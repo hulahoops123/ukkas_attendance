@@ -22,15 +22,15 @@
 import { reactive, onMounted, onUnmounted } from 'vue'
 
 const letters = [
-  { char: 'K', x: -180, y: 0, color: '#0AAA0A', circle: true },
-  { char: 'I', x: -60, y: 0,  color: '#00AEEF', circle: true },
+  { char: 'K', x: -240, y: 0, color: '#0AAA0A', circle: true },
+  { char: 'I', x: -80, y: 0,  color: '#00AEEF', circle: true },
   { char: 'D', x: 0, y: 0,   color: '#F75A79', circle: true },
-  { char: 'S', x: 60, y: 0,  color: '#FFD600', circle: true },
-  { char: 'A', x: 0, y: -120, color: '#0AAA0A', circle: false },
-  { char: 'U', x: 0,  y: -60, color: '#FFD600', circle: false },
-  { char: 'L', x: 0, y: 60, color: '#F75A79', circle: false },
-  { char: 'T', x: 0, y: 120, color: '#F75A79', circle: false },
-  { char: 'S', x: 0, y: 180, color: '#FF9800', circle: false }
+  { char: 'S', x: 80, y: 0,  color: '#FFD600', circle: true },
+  { char: 'A', x: 0, y: -160, color: '#0AAA0A', circle: false },
+  { char: 'U', x: 0,  y: -80, color: '#FFD600', circle: false },
+  { char: 'L', x: 0, y: 80, color: '#F75A79', circle: false },
+  { char: 'T', x: 0, y: 160, color: '#F75A79', circle: false },
+  { char: 'S', x: 0, y: 240, color: '#FF9800', circle: false }
 ]
 
 const positions = reactive(letters.map(l => ({ x: l.x, y: l.y })))
