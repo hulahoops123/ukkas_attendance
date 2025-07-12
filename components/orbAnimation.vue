@@ -34,11 +34,11 @@ const letters = [
 
 const positions = reactive(letters.map(l => ({ x: l.x, y: l.y })))
 const velocities = reactive(letters.map(() => ({ 
-  vx: (Math.random() - 0.5) * 4,
-  vy: (Math.random() - 0.5) * 4
+  vx: (Math.random() - 0.5) * 1,
+  vy: (Math.random() - 0.5) * 1
 })))
 const angles = reactive(letters.map(() => 0))
-const rotationVelocities = reactive(letters.map(() => (Math.random() - 0.5) * 10))
+const rotationVelocities = reactive(letters.map(() => (Math.random() - 0.5) * 2))
 
 let animationId = null
 let isAnimating = false
@@ -64,39 +64,44 @@ function startCycle() {
     if (elapsed >= CYCLE_DURATION) {
       startTime = currentTime
       letters.forEach((_, i) => {
-        velocities[i].vx = (Math.random() - 0.5) * 4
-        velocities[i].vy = (Math.random() - 0.5) * 4
-        rotationVelocities[i] = (Math.random() - 0.5) * 10
+        velocities[i].vx = (Math.random() - 0.5) * 1
+        velocities[i].vy = (Math.random() - 0.5) * 1
+        rotationVelocities[i] = (Math.random() - 0.5) * 2
       })
     }
 
     letters.forEach((letter, i) => {
       if (elapsed < RETURN_START_TIME) {
-        // Move & rotate
+        // Move & rotate with damping
         positions[i].x += velocities[i].vx
         positions[i].y += velocities[i].vy
         angles[i] += rotationVelocities[i]
+        
+        // Apply gentle damping to slow things down
+        velocities[i].vx *= 0.999
+        velocities[i].vy *= 0.999
+        rotationVelocities[i] *= 0.998
 
         // Bounce left/right
         if (positions[i].x <= -window.innerWidth/2 + LETTER_SIZE/2) {
           positions[i].x = -window.innerWidth/2 + LETTER_SIZE/2
           velocities[i].vx = Math.abs(velocities[i].vx)
-          rotationVelocities[i] += (Math.random() - 0.5) * 10
+          rotationVelocities[i] += (Math.random() - 0.5) * 2
         } else if (positions[i].x >= window.innerWidth/2 - LETTER_SIZE/2) {
           positions[i].x = window.innerWidth/2 - LETTER_SIZE/2
           velocities[i].vx = -Math.abs(velocities[i].vx)
-          rotationVelocities[i] += (Math.random() - 0.5) * 10
+          rotationVelocities[i] += (Math.random() - 0.5) * 2
         }
 
         // Bounce top/bottom
         if (positions[i].y <= -window.innerHeight/2 + LETTER_SIZE/2) {
           positions[i].y = -window.innerHeight/2 + LETTER_SIZE/2
           velocities[i].vy = Math.abs(velocities[i].vy)
-          rotationVelocities[i] += (Math.random() - 0.5) * 10
+          rotationVelocities[i] += (Math.random() - 0.5) * 2
         } else if (positions[i].y >= window.innerHeight/2 - LETTER_SIZE/2) {
           positions[i].y = window.innerHeight/2 - LETTER_SIZE/2
           velocities[i].vy = -Math.abs(velocities[i].vy)
-          rotationVelocities[i] += (Math.random() - 0.5) * 10
+          rotationVelocities[i] += (Math.random() - 0.5) * 2
         }
 
         // Check collisions with other letters
@@ -129,7 +134,7 @@ function startCycle() {
             
             if (velocityAlongNormal > 0) continue // Objects separating
             
-            const restitution = 0.8 // Bounce factor
+            const restitution = 0.3 // Bounce factor (lower = less bouncy)
             const impulse = -(1 + restitution) * velocityAlongNormal
             
             velocities[i].vx += impulse * normalX
@@ -137,9 +142,9 @@ function startCycle() {
             velocities[j].vx -= impulse * normalX
             velocities[j].vy -= impulse * normalY
 
-            // Add some random rotation on collision
-            rotationVelocities[i] += (Math.random() - 0.5) * 15
-            rotationVelocities[j] += (Math.random() - 0.5) * 15
+            // Add some gentle random rotation on collision
+            rotationVelocities[i] += (Math.random() - 0.5) * 3
+            rotationVelocities[j] += (Math.random() - 0.5) * 3
           }
         }
       } else {
