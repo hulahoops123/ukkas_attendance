@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full h-screen overflow-hidden">
+  <div class="relative w-full h-screen overflow-hidden flex items-center justify-center">
     <div
       v-for="(letter, index) in letters"
       :key="index"
@@ -22,16 +22,16 @@
 import { reactive, onMounted } from 'vue'
 
 const letters = [
-  { char: 'K', x: 0, y: -240, color: '#0AAA0A', circle: true },
-  { char: 'I', x: 0, y: -160, color: '#00AEEF', circle: true },
-  { char: 'D', x: 0, y: -80, color: '#F75A79', circle: true },
-  { char: 'S', x: 0, y: 0, color: '#FFD600', circle: true },
-  { char: 'A', x: -80, y: -80, color: '#0AAA0A', circle: false },
-  { char: 'D', x: 0, y: -80, color: '#F75A79', circle: false },
-  { char: 'U', x: 80, y: -80, color: '#FFD600', circle: false },
-  { char: 'L', x: 160, y: -80, color: '#F75A79', circle: false },
-  { char: 'T', x: 240, y: -80, color: '#F75A79', circle: false },
-  { char: 'S', x: 320, y: -80, color: '#FF9800', circle: false }
+  { char: 'K', x: 0, y: -120, color: '#0AAA0A', circle: true },
+  { char: 'I', x: 0, y: -40, color: '#00AEEF', circle: true },
+  { char: 'D', x: 0, y: 40, color: '#F75A79', circle: true },
+  { char: 'S', x: 0, y: 120, color: '#FFD600', circle: true },
+  { char: 'A', x: -160, y: 40, color: '#0AAA0A', circle: false },
+  { char: 'D', x: -80, y: 40, color: '#F75A79', circle: false },
+  { char: 'U', x: 80, y: 40, color: '#FFD600', circle: false },
+  { char: 'L', x: 160, y: 40, color: '#F75A79', circle: false },
+  { char: 'T', x: 240, y: 40, color: '#F75A79', circle: false },
+  { char: 'S', x: 320, y: 40, color: '#FF9800', circle: false }
 ]
 
 const positions = reactive(
