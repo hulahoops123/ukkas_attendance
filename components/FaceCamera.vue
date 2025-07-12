@@ -1,7 +1,11 @@
 <template>
   <div class="flex flex-col items-center mt-10">
     <div class="relative inline-block">
-      <video ref="video" autoplay muted playsinline class="border rounded w-[320px] h-[240px]" />
+      <video ref="video" autoplay muted playsinline 
+        :class="[
+          'rounded w-[320px] h-[240px] border-4 transition-colors duration-300',
+          faceDetected ? 'border-green-500' : 'border-blue-500'
+        ]" />
       <canvas ref="overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none" />
       <div v-if="showFeedback"
         class="absolute top-2 left-2 bg-green-600 text-white text-sm font-bold px-2 py-1 rounded pointer-events-none">
@@ -18,6 +22,7 @@ const emits = defineEmits(['faceFound', 'faceLost'])
 const video = ref(null)
 const overlay = ref(null)
 const showFeedback = ref(false)
+const faceDetected = ref(false)
 
 const { loadModels, detect, modelsLoaded, detections, getFaceDescriptor } = useFaceApi()
 
@@ -81,8 +86,10 @@ function startLoop() {
           resizedDetections.map(d => d.landmarks)
         )
 
-        showFeedback.value = resizedDetections.length > 0
-        if (showFeedback.value) emits('faceFound')
+        const hasFaces = resizedDetections.length > 0
+        showFeedback.value = hasFaces
+        faceDetected.value = hasFaces
+        if (hasFaces) emits('faceFound')
         else emits('faceLost')
       })
     }

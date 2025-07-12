@@ -21,10 +21,7 @@
         @faceFound="handleFaceFound"
         @faceLost="handleFaceLost"
         ref="faceCam"
-        :class="[
-          'rounded shadow-lg w-full border-4 transition-colors duration-300',
-          faceDetected ? 'border-green-500' : 'border-blue-500'
-        ]"
+        class="rounded shadow-lg w-full"
       />
 
       <!-- Instructions -->
