@@ -39,7 +39,7 @@
       <button v-if="cameraActive && !showModal"
         @click="backToIdle"
         class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-full">
-        ← Back to Idle ({{ remainingIdleTime }}s)
+        ← Back to Idle 
       </button>
     </div>
 
@@ -132,7 +132,6 @@ function startInactivityTimeout() {
   clearTimeout(cameraInactivityTimer.value)
   clearInterval(inactivityInterval.value)
   remainingIdleTime.value = 20
-  console.log("tinactiviuty timer started")
   cameraInactivityTimer.value = setTimeout(() => {
     console.log("No activity detected, returning to idle.")
     backToIdle()
