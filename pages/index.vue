@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center relative bg-transparent min-h-screen w-full m-0 p-0">
     <div v-if="showOverlay"
-      class="absolute inset-0 bg-black flex items-center justify-center text-3xl font-bold text-black z-50 h-screen w-screen"
+      class="fixed inset-0 bg-black flex items-center justify-center text-3xl font-bold text-black z-50"
       @click="startCamera">
       <OrbAnimation class="border-8 border-pink-600"></OrbAnimation>
     </div>
