@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center mt-10">
     <div class="relative inline-block">
       <video ref="video" autoplay muted playsinline class="border rounded w-[320px] h-[240px]" />
-      <canvas ref="overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none border-8 border-blue-800" />
+      <canvas ref="overlay" class="absolute top-0 left-0 w-full h-full pointer-events-none" />
       <div v-if="showFeedback"
         class="absolute top-2 left-2 bg-green-600 text-white text-sm font-bold px-2 py-1 rounded pointer-events-none">
         ✔ Face Detected
