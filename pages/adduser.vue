@@ -65,6 +65,24 @@
                      class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
             </div>
             
+            <div v-if="hasAdmin()" class="flex items-center">
+              <input v-model="isAdminUser" type="checkbox" id="adminCheckbox" 
+                     class="mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded" />
+              <label for="adminCheckbox" class="text-sm font-medium text-gray-700">Make this user an admin</label>
+            </div>
+            
+            <div v-if="hasAdmin() && isAdminUser">
+              <label class="block text-sm font-medium text-gray-700 mb-2">PIN</label>
+              <input v-model="pin" type="password" placeholder="Create a PIN" 
+                     class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
+            </div>
+            
+            <div v-if="hasAdmin() && isAdminUser">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Confirm PIN</label>
+              <input v-model="pinConfirm" type="password" placeholder="Confirm your PIN" 
+                     class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
+            </div>
+            
             <button @click="saveUser" 
                     class="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg shadow-md mt-6">
               Save User
@@ -109,6 +127,7 @@ const pinConfirm = ref('')
 const email = ref('')
 const pinError = ref('')
 const completionMsg = ref('')
+const isAdminUser = ref(false)
 
 // composable
 const { addUser, hasAdmin } = useLocalDb()
@@ -138,9 +157,10 @@ function saveUser() {
   }
   
   const isFirstAdmin = !hasAdmin()
+  const willBeAdmin = isFirstAdmin || isAdminUser.value
   
-  // Only validate PIN for first admin user
-  if (isFirstAdmin) {
+  // Validate PIN for admin users (first admin or new admin)
+  if (willBeAdmin) {
     if (!pin.value || !pinConfirm.value) {
       pinError.value = "PIN fields cannot be empty."
       return
@@ -158,13 +178,13 @@ function saveUser() {
 
   addUser({
     name: userName.value,
-    pin: isFirstAdmin ? pin.value : null,
+    pin: willBeAdmin ? pin.value : null,
     email: email.value,
     descriptors,
-    isAdmin: isFirstAdmin
+    isAdmin: willBeAdmin
   })
 
-  completionMsg.value = isFirstAdmin
+  completionMsg.value = willBeAdmin
     ? `Admin setup complete for ${userName.value}!`
     : `User ${userName.value} added successfully!`
 
