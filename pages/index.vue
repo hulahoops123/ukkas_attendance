@@ -1,7 +1,7 @@
 
 
 <template>
-<div class="min-h-screen w-full flex flex-col items-center px-4 relative" style="z-index: 1;">
+<div class="min-h-screen w-full flex flex-col items-center px-4 relative" style="z-index: 10;">
     <!-- Animated Background -->
     <div class="background">
       <span class="ball"></span>
@@ -348,7 +348,7 @@ function tryAgain() {
   left: 0;
   background: #4CB8B6;
   overflow: hidden;
-  z-index: 0;
+  z-index: -10;
 }
 
 .ball {
