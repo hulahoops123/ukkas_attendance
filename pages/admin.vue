@@ -58,7 +58,7 @@
       <h2 class="text-xl font-semibold mb-2">
         {{ searchQuery ? `Searching for '${searchQuery}'` : 'Registered Users' }}
       </h2>
-      <h2 class="text-xl font-semibold mb-2">Current User: {{ getCurrentUser()?.name || 'Not logged in' }}</h2>
+      <h2 class="text-xl font-semibold mb-2">Current User: {{ currentUserData?.name || 'Not logged in' }}</h2>
       <!-- <h2 class="text-xl font-semibold mb-2">{{ temp }}</h2> -->
       <div v-if="filteredUsers.length" class="space-y-2">
         <div 
@@ -109,6 +109,9 @@ import { useEmail } from '~/composables/useEmail'
 const router = useRouter()
 const { users, attendanceRefs, deleteUser, deleteAllUsers, currentUser, getCurrentUser, emailConfig, setReportEmail, getReportEmail, resetToFirstUserEmail } = useLocalDb()
 const { sendEmail } = useEmail()
+
+// Reactive current user for display
+const currentUserData = computed(() => getCurrentUser())
 
 const searchQuery = ref('')
 const showEmailConfig = ref(false)
@@ -180,7 +183,7 @@ function handleImport(event) {
   reader.readAsText(file)
 }
 function handleDeleteUser(name) {
-  const current = getCurrentUser()
+  const current = currentUserData.value
   console.log('Current user:', JSON.stringify(current))
   console.log('Current user name:', current?.name)
   console.log('Trying to delete:', name)
