@@ -70,7 +70,7 @@ import { useLocalDb } from '~/composables/useLocalDb'
 import * as faceapi from 'face-api.js'
 
 const router = useRouter()
-const { getAllUsers, addAttendanceLog, getCurrentStatus } = useLocalDb()
+const { getAllUsers, addAttendanceLog, getCurrentStatus, setCurrentUser } = useLocalDb()
 
 const faceCam = ref(null)
 const showOverlay = ref(true)
@@ -164,6 +164,9 @@ async function handleFaceFound() {
       console.log(`Matched with ${user.name}`)
       matchedUser.value = user
       currentUserName.value = user.name
+      
+      // Set the current user so they're properly logged in
+      setCurrentUser(user)
 
       if (user.isAdmin) {
         showAdminModal(user)
