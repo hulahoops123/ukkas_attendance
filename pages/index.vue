@@ -1,63 +1,75 @@
+
+
 <template>
-  <div class="flex flex-col items-center relative bg-transparent min-h-screen w-full m-0 p-0">
-    <div v-if="showOverlay"
-      class="fixed inset-0 bg-black flex items-center justify-center text-3xl font-bold text-black z-50"
-      @click="startCamera">
-      <OrbAnimation class="border-8 border-pink-600"></OrbAnimation>
-    </div>
+<div class="min-h-screen w-full bg-gray-800 flex flex-col items-center px-4">
+    <!-- Heading -->
+    <h1 class="text-4xl font-bold text-gray-200 mt-8 mb-6">Therapist Attendance System</h1>
 
-    <FaceCamera v-if="cameraActive" @faceFound="handleFaceFound" @faceLost="handleFaceLost" ref="faceCam" />
+    <!-- Main content stack -->
+    <div class="flex flex-col items-center space-y-6 w-full max-w-md">
 
-    <!-- Instructions when camera is active -->
-    <div v-if="cameraActive && !showModal" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40">
-      <div class="bg-black bg-opacity-75 text-white px-8 py-6 rounded-lg shadow-lg text-center max-w-md">
-        <h3 class="text-xl font-semibold mb-3 text-blue-300">Face Recognition Active</h3>
-        <div class="space-y-2 text-sm">
-          <p class="flex items-center justify-center">
-            <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-            Stand still and look directly at the camera
-          </p>
-          <p class="flex items-center justify-center">
-            <span class="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-            Keep your face well-lit and visible
-          </p>
-          <p class="flex items-center justify-center">
-            <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
-            Wait for recognition to complete
-          </p>
-        </div>
-        <div class="mt-4 text-xs text-gray-300">
-          Auto-return to idle in {{ remainingIdleTime }}s
-        </div>
+      <!-- Overlay to start camera -->
+      <div v-if="showOverlay"
+        class="fixed inset-0 bg-black flex items-center justify-center text-3xl font-bold text-black z-50"
+        @click="startCamera">
+        <OrbAnimation class="border-8 border-pink-600"></OrbAnimation>
       </div>
+
+      <!-- Camera feed -->
+      <FaceCamera
+        v-if="cameraActive"
+        @faceFound="handleFaceFound"
+        @faceLost="handleFaceLost"
+        ref="faceCam"
+        class="rounded shadow-lg w-full"
+      />
+
+      <!-- Instructions -->
+      <div v-if="cameraActive && !showModal" class="bg-black bg-opacity-75 text-white px-6 py-4 rounded-lg shadow w-full">
+        <h3 class="text-lg font-semibold mb-3 text-blue-300">Face Recognition Active</h3>
+        <div class="space-y-2 text-sm">
+          <p class="flex items-center"><span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>Stand still and look directly at the camera</p>
+          <p class="flex items-center"><span class="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>Keep your face well-lit and visible</p>
+          <p class="flex items-center"><span class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>Wait for recognition to complete</p>
+        </div>
+        <div class="mt-2 text-xs text-gray-300">Auto-return to idle in {{ remainingIdleTime }}s</div>
+      </div>
+
+      <!-- Back to Idle -->
+      <button v-if="cameraActive && !showModal"
+        @click="backToIdle"
+        class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-full">
+        ← Back to Idle ({{ remainingIdleTime }}s)
+      </button>
     </div>
 
-    <button v-if="cameraActive && !showModal" @click="backToIdle"
-      class="absolute top-4 right-4 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 z-40">
-      ← Back to Idle ({{ remainingIdleTime }}s)
-    </button>
-
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white p-6 rounded shadow-lg text-center">
+    <!-- Modal -->
+    <div v-if="showModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded shadow-lg text-center w-80">
         <!-- Admin modal -->
         <template v-if="matchedUser?.isAdmin">
           <p class="text-xl font-bold mb-2">
             Hi {{ currentUserName }}, you’ll be {{ getNextAction(matchedUser) }} in {{ countdown }}s
           </p>
-          <button @click="goToAdminDashboard" class="mt-2 px-4 py-2 bg-purple-600 text-white rounded">
+          <button @click="goToAdminDashboard"
+            class="mt-2 px-4 py-2 bg-purple-600 text-white rounded w-full">
             Go to Admin Dashboard
           </button>
         </template>
 
+        <!-- Normal user -->
         <template v-else-if="matchedUser">
           <p class="text-xl font-bold mb-4">
             Hi {{ currentUserName }}, you’ve been {{ currentAction }}.
           </p>
-          <button @click="closeModal" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
+          <button @click="closeModal"
+            class="mt-2 px-4 py-2 bg-blue-500 text-white rounded w-full">
             OK
           </button>
         </template>
 
+        <!-- No match -->
         <template v-else>
           <p class="text-xl font-bold mb-4">
             <span v-if="noMatchAttempts < 3">
@@ -68,10 +80,12 @@
             </span>
           </p>
           <div>
-            <button v-if="noMatchAttempts < 3" @click="tryAgain" class="mt-2 px-4 py-2 bg-green-600 text-white rounded">
+            <button v-if="noMatchAttempts < 3" @click="tryAgain"
+              class="mt-2 px-4 py-2 bg-green-600 text-white rounded w-full">
               Try Again
             </button>
-            <button v-else @click="closeModal" class="mt-2 px-4 py-2 bg-gray-600 text-white rounded">
+            <button v-else @click="closeModal"
+              class="mt-2 px-4 py-2 bg-gray-600 text-white rounded w-full">
               Back to Idle
             </button>
           </div>
@@ -80,6 +94,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { useRouter } from 'vue-router'
