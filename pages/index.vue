@@ -21,7 +21,10 @@
         @faceFound="handleFaceFound"
         @faceLost="handleFaceLost"
         ref="faceCam"
-        class="rounded shadow-lg w-full"
+        :class="[
+          'rounded shadow-lg w-full border-4 transition-colors duration-300',
+          faceDetected ? 'border-green-500' : 'border-blue-500'
+        ]"
       />
 
       <!-- Instructions -->
@@ -125,6 +128,7 @@ const cameraInactivityTimer = ref(null)
 const noMatchAutoCloseTimer = ref(null)
 const remainingIdleTime = ref(20)
 const inactivityInterval = ref(null)
+const faceDetected = ref(false)
 
 // 🕒 Helper functions
 function startInactivityTimeout() {
@@ -179,6 +183,7 @@ function startCamera() {
 async function handleFaceFound() {
   if (processing.value) return
   clearInactivityTimeout()
+  faceDetected.value = true
   processing.value = true
 
   console.log("Face found, trying to match...")
@@ -223,6 +228,7 @@ async function handleFaceFound() {
 
 function handleFaceLost() {
   // console.log("Face lost")
+  faceDetected.value = false
   // Only start timeout if not already running
   if (!cameraInactivityTimer.value) {
     startInactivityTimeout()
@@ -245,6 +251,7 @@ function backToIdle() {
   showOverlay.value = true
   processing.value = false
   noMatchAttempts.value = 0
+  faceDetected.value = false
   clearTimeout(cameraInactivityTimer.value)
   clearTimeout(noMatchAutoCloseTimer.value)
   clearInterval(inactivityInterval.value)
