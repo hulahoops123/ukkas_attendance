@@ -111,6 +111,13 @@ function startInactivityTimeout() {
       clearInterval(inactivityInterval.value)
     }
   }, 1000)
+  
+  // Start the first countdown tick immediately
+  setTimeout(() => {
+    if (remainingIdleTime.value > 0) {
+      remainingIdleTime.value--
+    }
+  }, 1000)
 }
 
 
