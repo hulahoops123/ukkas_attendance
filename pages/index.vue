@@ -67,6 +67,7 @@ const countdown = ref(6)
 const countdownTimer = ref(null)
 const adminInterrupt = ref(false)
 const processing = ref(false)
+const noMatchAttempts = ref(0)
 
 function getNextAction(user) {
   const status = getCurrentStatus(user.name)
@@ -117,6 +118,9 @@ async function handleFaceFound() {
       cameraActive.value = false
     } else {
       console.log("No matching user found.")
+      noMatchAttempts.value++
+      showNoMatchModal()
+      cameraActive.value = false
     }
   } catch (e) {
     console.error("Error during detection:", e)
@@ -170,11 +174,24 @@ function backToIdle() {
   cameraActive.value = false
   showOverlay.value = true
   processing.value = false
+  noMatchAttempts.value = 0
+}
+
+function showNoMatchModal() {
+  matchedUser.value = null
+  currentUserName.value = ''
+  currentAction.value = ''
+  showModal.value = true
 }
 
 function closeModal() {
   showModal.value = false
   showOverlay.value = true
   cameraActive.value = false
+  
+  // Reset counter when going back to idle after contact admin message
+  if (noMatchAttempts.value >= 3) {
+    noMatchAttempts.value = 0
+  }
 }
 </script>
