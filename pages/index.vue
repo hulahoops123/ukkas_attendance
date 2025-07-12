@@ -8,6 +8,29 @@
 
     <FaceCamera v-if="cameraActive" @faceFound="handleFaceFound" @faceLost="handleFaceLost" ref="faceCam" />
 
+    <!-- Instructions when camera is active -->
+    <div v-if="cameraActive && !showModal" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40">
+      <div class="bg-black bg-opacity-75 text-white px-8 py-6 rounded-lg shadow-lg text-center max-w-md">
+        <h3 class="text-xl font-semibold mb-3 text-blue-300">Face Recognition Active</h3>
+        <div class="space-y-2 text-sm">
+          <p class="flex items-center justify-center">
+            <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+            Stand still and look directly at the camera
+          </p>
+          <p class="flex items-center justify-center">
+            <span class="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+            Keep your face well-lit and visible
+          </p>
+          <p class="flex items-center justify-center">
+            <span class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
+            Wait for recognition to complete
+          </p>
+        </div>
+        <div class="mt-4 text-xs text-gray-300">
+          Auto-return to idle in {{ remainingIdleTime }}s
+        </div>
+      </div>
+    </div>
 
     <button v-if="cameraActive && !showModal" @click="backToIdle"
       class="absolute top-4 right-4 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 z-40">
