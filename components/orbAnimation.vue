@@ -98,6 +98,50 @@ function startCycle() {
           velocities[i].vy = -Math.abs(velocities[i].vy)
           rotationVelocities[i] += (Math.random() - 0.5) * 10
         }
+
+        // Check collisions with other letters
+        for (let j = i + 1; j < letters.length; j++) {
+          const dx = positions[i].x - positions[j].x
+          const dy = positions[i].y - positions[j].y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          const minDistance = LETTER_SIZE
+
+          if (distance < minDistance && distance > 0) {
+            // Calculate collision response
+            const overlap = minDistance - distance
+            const separationX = (dx / distance) * overlap * 0.5
+            const separationY = (dy / distance) * overlap * 0.5
+
+            // Separate the letters
+            positions[i].x += separationX
+            positions[i].y += separationY
+            positions[j].x -= separationX
+            positions[j].y -= separationY
+
+            // Calculate new velocities (elastic collision)
+            const normalX = dx / distance
+            const normalY = dy / distance
+            
+            const relativeVelocityX = velocities[i].vx - velocities[j].vx
+            const relativeVelocityY = velocities[i].vy - velocities[j].vy
+            
+            const velocityAlongNormal = relativeVelocityX * normalX + relativeVelocityY * normalY
+            
+            if (velocityAlongNormal > 0) continue // Objects separating
+            
+            const restitution = 0.8 // Bounce factor
+            const impulse = -(1 + restitution) * velocityAlongNormal
+            
+            velocities[i].vx += impulse * normalX
+            velocities[i].vy += impulse * normalY
+            velocities[j].vx -= impulse * normalX
+            velocities[j].vy -= impulse * normalY
+
+            // Add some random rotation on collision
+            rotationVelocities[i] += (Math.random() - 0.5) * 15
+            rotationVelocities[j] += (Math.random() - 0.5) * 15
+          }
+        }
       } else {
         // Return phase
         const returnProgress = (elapsed - RETURN_START_TIME) / (CYCLE_DURATION - RETURN_START_TIME)
