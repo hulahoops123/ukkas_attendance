@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center mt-10 relative bg-transparent">
+  <div class="flex flex-col items-center relative bg-transparent min-h-screen w-full m-0 p-0">
     <div v-if="showOverlay"
       class="absolute inset-0 bg-black flex items-center justify-center text-3xl font-bold text-black z-50 h-screen w-screen"
       @click="startCamera">
