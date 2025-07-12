@@ -104,6 +104,7 @@ function startInactivityTimeout() {
     backToIdle()
   }, 20000)
 
+  // Start the countdown immediately
   inactivityInterval.value = setInterval(() => {
     remainingIdleTime.value--
     if (remainingIdleTime.value <= 0) {
@@ -131,7 +132,7 @@ function startNoMatchAutoClose() {
 function startCamera() {
   showOverlay.value = false
   cameraActive.value = true
-    clearInactivityTimeout() // make sure any old intervals gone
+  clearInactivityTimeout() // make sure any old intervals gone
   startInactivityTimeout()
 }
 
