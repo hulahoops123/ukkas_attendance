@@ -65,7 +65,7 @@
     </section>
 
     <!-- USERS -->
-    <section class="mb-8">
+    <section class="mb-8 bg-white bg-opacity-90 p-4 rounded-lg">
       <h2 class="text-xl font-semibold mb-2">
         {{ searchQuery ? `Searching for '${searchQuery}'` : 'Registered Users' }}
       </h2>
