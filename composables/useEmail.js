@@ -1,12 +1,11 @@
 export function useEmail() {
-  // EmailJS configuration
-  const SERVICE_ID = 'service_yyzqiep'
-  const TEMPLATE_ID = 'template_k48p3di' 
-  const PUBLIC_KEY = 'ae8r1L_Oo_pWaOJTW'
+  // Load from environment variables
+  const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
+  const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+  const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
 
   async function sendEmail(to_email, to_name, subject, message) {
-    // Check if we have all required credentials
-    if (PUBLIC_KEY === 'your_public_key') {
+    if (!PUBLIC_KEY) {
       console.warn('EmailJS public key not configured, falling back to mailto')
       const mailtoLink = `mailto:${to_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`
       window.location.href = mailtoLink
@@ -14,7 +13,6 @@ export function useEmail() {
     }
 
     try {
-      // Try to import EmailJS
       const { default: emailjs } = await import('@emailjs/browser')
       
       const templateParams = {
@@ -36,11 +34,8 @@ export function useEmail() {
       return { success: true, response }
     } catch (error) {
       console.error('Email send failed:', error)
-      
-      // Fallback to mailto if EmailJS fails
       const mailtoLink = `mailto:${to_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`
       window.location.href = mailtoLink
-      
       return { success: true, fallback: true }
     }
   }
