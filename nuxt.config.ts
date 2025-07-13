@@ -13,8 +13,8 @@ export default defineNuxtConfig({
   },
   pwa: {
     manifest: {
-      name: "HSQUAD PB",
-      short_name: "HSQUAD",
+      name: "Therapist Atendance",
+      short_name: "KIDS",
       },
     workbox: {
       enabled: true
