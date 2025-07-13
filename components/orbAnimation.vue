@@ -60,9 +60,9 @@ function startCycle() {
     if (elapsed >= CYCLE_DURATION) {
       startTime = currentTime
       letters.forEach((_, i) => {
-        velocities[i].vx = (Math.random() - 0.5) * 1.2
-        velocities[i].vy = (Math.random() - 0.5) * 1.2
-        rotationVelocities[i] = (Math.random() - 0.5) * 3
+        velocities[i].vx = (Math.random() - 0.5) * 2.4
+        velocities[i].vy = (Math.random() - 0.5) * 2.4
+        rotationVelocities[i] = (Math.random() - 0.5) * 4
       })
     }
 
@@ -73,9 +73,9 @@ function startCycle() {
         positions[i].y += velocities[i].vy
         angles[i] += rotationVelocities[i]
 
-        velocities[i].vx *= 0.995 // more damping
-        velocities[i].vy *= 0.995
-        rotationVelocities[i] *= 0.995
+        velocities[i].vx *= 0.998 // more damping
+        velocities[i].vy *= 0.998
+        rotationVelocities[i] *= 0.998
 
         // Bounce
         if (positions[i].x <= -window.innerWidth / 2 + LETTER_SIZE / 2) {
