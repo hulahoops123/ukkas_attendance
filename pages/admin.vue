@@ -13,12 +13,18 @@
 
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+        <div v-if="deferredPrompt" class="bg-green-700 text-white p-4 rounded mb-6 flex items-center gap-3">
+          <p class="text-lg font-semibold">📲 Install this app on your device?</p>
+          <button @click="deferredPrompt.prompt()"
+            class="bg-white text-green-800 px-3 py-1 rounded hover:bg-gray-200">Install</button>
+          <button @click="deferredPrompt = null"
+            class="bg-white text-green-800 px-3 py-1 rounded hover:bg-gray-200">Dismiss</button>
+        </div>
       <div class="flex gap-2">
         <button @click="showHelp = true" class="text-gray-500 rounded bg-yellow-500 hover:text-gray-800 ml-2"
           aria-label="Help">
           ❓
         </button>
-
         <button @click="goToHome"
           class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 flex items-center gap-2">
           <span>🏠</span> Home
@@ -336,77 +342,6 @@ async function emailAllAttendanceLogs(event) {
   }
 }
 
-
-async function emailAttendanceLogs(event) {
-  const reportEmail = getReportEmail()
-  if (!reportEmail) {
-    alert("No email address configured. Please set up an email address in the Email Configuration section.")
-    return
-  }
-
-  try {
-    // Show loading state                                                                                                                                                                                          
-    const button = event.target
-    const originalText = button.textContent
-    button.textContent = 'Sending...'
-    button.disabled = true
-
-    // Format today's attendance logs for email                                                                                                                                                                    
-    const emailBody = formatAttendanceForEmail()
-    const subject = `Attendance Report - ${new Date().toLocaleDateString()}`
-
-    // Send email using the composable                                                                                                                                                                             
-    const result = await sendEmail(
-      reportEmail,
-      'Admin',
-      subject,
-      emailBody
-    )
-
-    if (result.success) {
-      alert('Attendance report sent successfully!')
-    } else {
-      throw new Error(result.error)
-    }
-
-    // Restore button state                                                                                                                                                                                        
-    button.textContent = originalText
-    button.disabled = false
-
-  } catch (error) {
-    console.error('Failed to send email:', error)
-    alert('Failed to send email. Please try again.')
-
-    // Restore button state                                                                                                                                                                                        
-    const button = event.target
-    button.textContent = '📧 Email Report'
-    button.disabled = false
-  }
-}
-
-function formatAttendanceForEmail() {
-  const today = new Date().toLocaleDateString()
-  let emailContent = `Attendance Report for ${today}\n\n`
-
-  if (Object.keys(todayLogs.value).length === 0) {
-    emailContent += "No attendance recorded today.\n"
-  } else {
-    for (const [key, logs] of Object.entries(todayLogs.value)) {
-      const employeeName = getEmployeeNameFromKey(key)
-      emailContent += `${employeeName}:\n`
-
-      logs.forEach(log => {
-        const time = formatTime(log.time)
-        emailContent += `  - ${log.status} at ${time}\n`
-      })
-      emailContent += "\n"
-    }
-  }
-
-  emailContent += `\nReport generated on ${new Date().toLocaleString()}`
-  return emailContent
-}
-
 function updateReportEmail() {
   if (!newEmailAddress.value) {
     alert('Please enter a valid email address.')
@@ -423,7 +358,21 @@ function resetEmailToFirstUser() {
   resetToFirstUserEmail()
   showEmailConfig.value = false
   alert('Email reset to first user\'s email address.')
-}                                                                                                                                                                                                                  
+}
+
+const deferredPrompt = ref(null)
+
+onMounted(() => {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault()
+    deferredPrompt.value = e
+  })
+
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt.value = null
+  })
+})
+
 </script>
 
 <style scoped>
