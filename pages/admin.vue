@@ -1,455 +1,535 @@
-<template>                                                                                                                                                                                                         
-  <div class="max-w-4xl mx-auto mt-10 p-4 relative" style="z-index: 10;">                                                                                                                                          
-    <div class="background">                                                                                                                                                                                       
-      <span class="ball"></span>                                                                                                                                                                                   
-      <span class="ball"></span>                                                                                                                                                                                   
-      <span class="ball"></span>                                                                                                                                                                                   
-      <span class="ball"></span>                                                                                                                                                                                   
-      <span class="ball"></span>                                                                                                                                                                                   
-      <span class="ball"></span>                                                                                                                                                                                   
-      <span class="ball"></span>                                                                                                                                                                                   
-      <span class="ball"></span>                                                                                                                                                                                   
-    </div>                                                                                                                                                                                                         
-                                                                                                                                                                                                                   
-    <div class="flex justify-between items-center mb-6">                                                                                                                                                           
-      <h1 class="text-3xl font-bold">Admin Dashboard</h1>                                                                                                                                                          
-      <button @click="goToHome"                                                                                                                                                                                    
-              class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 flex items-center gap-2">                                                                                                          
-        <span>🏠</span> Home                                                                                                                                                                                       
-      </button>                                                                                                                                                                                                    
-    </div>                                                                                                                                                                                                         
-                                                                                                                                                                                                                   
-    <div class="bg-white bg-opacity-90 p-4 rounded-lg mb-6">                                                                                                                                                       
-      <p class="text-lg">                                                                                                                                                                                          
-        <span class="font-semibold">Current User:</span>                                                                                                                                                           
-        {{ currentUserData?.name || 'Not logged in' }}                                                                                                                                                             
-      </p>                                                                                                                                                                                                         
-    </div>                                                                                                                                                                                                         
-                                                                                                                                                                                                                   
-    <section class="bg-white bg-opacity-90 p-6 rounded-lg mb-6">                                                                                                                                                   
-      <div class="flex justify-between items-center mb-4">                                                                                                                                                         
-        <h2 class="text-2xl font-semibold">Today's Attendance Logs</h2>                                                                                                                                            
-        <button @click="emailAttendanceLogs"                                                                                                                                                                       
-                class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">                                                                                                                            
-          📧 Email Report                                                                                                                                                                                          
-        </button>                                                                                                                                                                                                  
-      </div>                                                                                                                                                                                                       
-                                                                                                                                                                                                                   
-      <div v-if="Object.keys(todayLogs).length" class="space-y-4">                                                                                                                                                 
-        <div                                                                                                                                                                                                       
-          v-for="(logs, key) in todayLogs" :key="key"                                                                                                                                                              
-          class="border p-4 rounded bg-gray-50"                                                                                                                                                                    
-        >                                                                                                                                                                                                          
-          <p class="font-bold mb-2 text-lg">{{ getEmployeeNameFromKey(key) }}</p>                                                                                                                                  
-          <ul class="list-disc ml-6 text-sm text-gray-700">                                                                                                                                                        
-            <li v-for="(log, index) in logs" :key="index" class="mb-1">                                                                                                                                            
-              <span class="font-medium">{{ log.status }}</span> at {{ formatTime(log.time) }}                                                                                                                      
-            </li>                                                                                                                                                                                                  
-          </ul>                                                                                                                                                                                                    
-        </div>                                                                                                                                                                                                     
-      </div>                                                                                                                                                                                                       
-      <div v-else class="text-center py-8 text-gray-500">                                                                                                                                                          
-        <p class="text-lg">No attendance recorded today yet.</p>                                                                                                                                                   
-      </div>                                                                                                                                                                                                       
-    </section>                                                                                                                                                                                                     
-                                                                                                                                                                                                                   
-    <section class="bg-white bg-opacity-90 rounded-lg mb-6">                                                                                                                                                       
-      <button @click="showUserManagement = !showUserManagement"                                                                                                                                                    
-              class="w-full p-4 text-left flex justify-between items-center hover:bg-gray-50 rounded-lg">                                                                                                          
-        <h2 class="text-xl font-semibold">👥 User Management</h2>                                                                                                                                                  
-        <span class="text-2xl">{{ showUserManagement ? '−' : '+' }}</span>                                                                                                                                         
-      </button>                                                                                                                                                                                                    
-                                                                                                                                                                                                                   
-      <div v-if="showUserManagement" class="p-6 border-t">                                                                                                                                                         
-        <div class="flex flex-wrap gap-3 mb-4">                                                                                                                                                                    
-          <input v-model="searchQuery" placeholder="Search users..."                                                                                                                                               
-                 class="border px-3 py-2 rounded flex-1 min-w-0" />                                                                                                                                                
-          <button @click="goToAddUser"                                                                                                                                                                             
-                  class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 whitespace-nowrap">                                                                                                          
-            + Add User                                                                                                                                                                                             
-          </button>                                                                                                                                                                                                
-        </div>                                                                                                                                                                                                     
-                                                                                                                                                                                                                   
-        <div class="flex flex-wrap gap-3 mb-4 p-3 bg-gray-50 rounded">                                                                                                                                             
-          <button @click="exportUsers"                                                                                                                                                                             
-                  class="bg-pink-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap">                                                                                                            
-            📤 Export Users                                                                                                                                                                                        
-          </button>                                                                                                                                                                                                
-          <button @click="triggerImport"                                                                                                                                                                           
-                  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap">                                                                                                            
-            📥 Import Users                                                                                                                                                                                        
-          </button>                                                                                                                                                                                                
-          <input ref="fileInput" type="file" accept=".json"                                                                                                                                                        
-                 @change="handleImport"                                                                                                                                                                            
-                 class="hidden" />                                                                                                                                                                                 
-          <button @click="confirmDeleteAllUsers"                                                                                                                                                                   
-                  class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 ml-auto whitespace-nowrap">                                                                                                      
-            🗑️ Delete All Users                                                                                                                                                                                    
-          </button>                                                                                                                                                                                                
-        </div>                                                                                                                                                                                                     
-                                                                                                                                                                                                                   
-        <div>                                                                                                                                                                                                      
-          <h3 class="font-semibold mb-3">                                                                                                                                                                          
-            {{ searchQuery ? `Search results for '${searchQuery}'` : 'All Users' }}                                                                                                                                
-            ({{ filteredUsers.length }})                                                                                                                                                                           
-          </h3>                                                                                                                                                                                                    
-                                                                                                                                                                                                                   
-          <div v-if="filteredUsers.length" class="space-y-2 max-h-64 overflow-y-auto">                                                                                                                             
-            <div                                                                                                                                                                                                   
-              v-for="user in filteredUsers" :key="user.name"                                                                                                                                                       
-              class="border p-3 rounded flex justify-between items-center bg-white"                                                                                                                                
-            >                                                                                                                                                                                                      
-              <div>                                                                                                                                                                                                
-                <p class="font-bold">{{ user.name }}</p>                                                                                                                                                           
-                <p class="text-sm text-gray-600">{{ user.email || 'No email' }}</p>                                                                                                                                
-                <p v-if="user.isAdmin" class="text-xs text-purple-600 font-semibold">👑 Admin</p>                                                                                                                  
-              </div>                                                                                                                                                                                               
-              <button @click="handleDeleteUser(user.name)"                                                                                                                                                         
-                      class="text-xs bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">                                                                                                                    
-                Delete                                                                                                                                                                                             
-              </button>                                                                                                                                                                                            
-            </div>                                                                                                                                                                                                 
-          </div>                                                                                                                                                                                                   
-          <p v-else class="text-gray-600 text-center py-4">No users found.</p>                                                                                                                                     
-        </div>                                                                                                                                                                                                     
-      </div>                                                                                                                                                                                                       
-    </section>                                                                                                                                                                                                     
-                                                                                                                                                                                                                   
-    <section class="bg-white bg-opacity-90 rounded-lg">                                                                                                                                                            
-      <button @click="showEmailConfig = !showEmailConfig"                                                                                                                                                          
-              class="w-full p-4 text-left flex justify-between items-center hover:bg-gray-50 rounded-lg">                                                                                                          
-        <h2 class="text-xl font-semibold">📧 Email Configuration</h2>                                                                                                                                              
-        <span class="text-2xl">{{ showEmailConfig ? '−' : '+' }}</span>                                                                                                                                            
-      </button>                                                                                                                                                                                                    
-                                                                                                                                                                                                                   
-      <div v-if="showEmailConfig" class="p-6 border-t">                                                                                                                                                            
-        <div class="mb-4">                                                                                                                                                                                         
-          <p class="text-sm text-gray-600 mb-1">Reports are currently sent to:</p>                                                                                                                                 
-          <p class="font-semibold text-lg">{{ getReportEmail() || 'No email configured' }}</p>                                                                                                                     
-        </div>                                                                                                                                                                                                     
-                                                                                                                                                                                                                   
-        <div class="space-y-3">                                                                                                                                                                                    
-          <div class="flex flex-col sm:flex-row gap-2">                                                                                                                                                            
-            <input v-model="newEmailAddress"                                                                                                                                                                       
-                   type="email"                                                                                                                                                                                    
-                   placeholder="Enter custom email address"                                                                                                                                                        
-                   class="border px-3 py-2 rounded flex-1 min-w-0 h-10" />                                                                                                                                         
-            <button @click="updateReportEmail"                                                                                                                                                                     
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap h-10">                                                                                                     
-              Set Custom Email                                                                                                                                                                                     
-            </button>                                                                                                                                                                                              
-          </div>                                                                                                                                                                                                   
-          <button @click="resetEmailToFirstUser"                                                                                                                                                                   
-                  class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700">                                                                                                                      
-            Reset to First User's Email                                                                                                                                                                            
-          </button>                                                                                                                                                                                                
-        </div>                                                                                                                                                                                                     
-      </div>                                                                                                                                                                                                       
-    </section>                                                                                                                                                                                                     
-                                                                                                                                                                                                                   
-  </div>                                                                                                                                                                                                           
-</template>                                                                                                                                                                                                        
-                                                                                                                                                                                                                   
-<script setup>                                                                                                                                                                                                     
-import { useRouter } from 'vue-router'                                                                                                                                                                             
-import { useLocalDb } from '~/composables/useLocalDb'                                                                                                                                                              
-import { useEmail } from '~/composables/useEmail'                                                                                                                                                                  
-                                                                                                                                                                                                                   
-const router = useRouter()                                                                                                                                                                                         
-const { users, attendanceRefs, deleteUser, deleteAllUsers, currentUser, getCurrentUser, emailConfig, setReportEmail, getReportEmail, resetToFirstUserEmail } = useLocalDb()                                        
-const { sendEmail } = useEmail()                                                                                                                                                                                   
-                                                                                                                                                                                                                   
+<template>
+  <div class="max-w-4xl mx-auto mt-10 p-4 relative" style="z-index: 10;">
+    <div class="background">
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+      <span class="ball"></span>
+    </div>
+
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+      <div class="flex gap-2">
+        <button @click="showHelp = true" class="text-gray-500 rounded bg-yellow-500 hover:text-gray-800 ml-2"
+          aria-label="Help">
+          ❓
+        </button>
+
+        <button @click="goToHome"
+          class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 flex items-center gap-2">
+          <span>🏠</span> Home
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white bg-opacity-90 p-4 rounded-lg mb-6">
+      <p class="text-lg">
+        <span class="font-semibold">Current User:</span>
+        {{ currentUserData?.name || 'Not logged in' }}
+      </p>
+    </div>
+
+    <section class="bg-white bg-opacity-90 p-6 rounded-lg mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-semibold">Today's Attendance Logs</h2>
+        <button @click="emailAllAttendanceLogs" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+          📧 Email Report
+        </button>
+      </div>
+
+      <div v-if="Object.keys(todayLogs).length" class="space-y-4">
+        <div v-for="(logs, key) in todayLogs" :key="key" class="border p-4 rounded bg-gray-50">
+          <p class="font-bold mb-2 text-lg">{{ getEmployeeNameFromKey(key) }}</p>
+          <ul class="list-disc ml-6 text-sm text-gray-700">
+            <li v-for="(log, index) in logs" :key="index" class="mb-1">
+              <span class="font-medium">{{ log.status }}</span> at {{ formatTime(log.time) }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div v-else class="text-center py-8 text-gray-500">
+        <p class="text-lg">No attendance recorded today yet.</p>
+      </div>
+    </section>
+
+    <section class="bg-white bg-opacity-90 rounded-lg mb-6">
+      <button @click="showUserManagement = !showUserManagement"
+        class="w-full p-4 text-left flex justify-between items-center hover:bg-gray-50 rounded-lg">
+        <h2 class="text-xl font-semibold">👥 User Management</h2>
+        <span class="text-2xl">{{ showUserManagement ? '−' : '+' }}</span>
+      </button>
+
+      <div v-if="showUserManagement" class="p-6 border-t">
+        <div class="flex flex-wrap gap-3 mb-4">
+          <input v-model="searchQuery" placeholder="Search users..." class="border px-3 py-2 rounded flex-1 min-w-0" />
+          <button @click="goToAddUser"
+            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 whitespace-nowrap">
+            + Add User
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-3 mb-4 p-3 bg-gray-50 rounded">
+          <button @click="exportUsers"
+            class="bg-pink-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap">
+            📤 Export Users
+          </button>
+          <button @click="triggerImport"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap">
+            📥 Import Users
+          </button>
+          <input ref="fileInput" type="file" accept=".json" @change="handleImport" class="hidden" />
+          <button @click="confirmDeleteAllUsers"
+            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 ml-auto whitespace-nowrap">
+            🗑️ Delete All Users
+          </button>
+        </div>
+
+        <div>
+          <h3 class="font-semibold mb-3">
+            {{ searchQuery ? `Search results for '${searchQuery}'` : 'All Users' }}
+            ({{ filteredUsers.length }})
+          </h3>
+
+          <div v-if="filteredUsers.length" class="space-y-2 max-h-64 overflow-y-auto">
+            <div v-for="user in filteredUsers" :key="user.name"
+              class="border p-3 rounded flex justify-between items-center bg-white">
+              <div>
+                <p class="font-bold">{{ user.name }}</p>
+                <p class="text-sm text-gray-600">{{ user.email || 'No email' }}</p>
+                <p v-if="user.isAdmin" class="text-xs text-purple-600 font-semibold">👑 Admin</p>
+              </div>
+              <button @click="handleDeleteUser(user.name)"
+                class="text-xs bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                Delete
+              </button>
+            </div>
+          </div>
+          <p v-else class="text-gray-600 text-center py-4">No users found.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white bg-opacity-90 rounded-lg">
+      <button @click="showEmailConfig = !showEmailConfig"
+        class="w-full p-4 text-left flex justify-between items-center hover:bg-gray-50 rounded-lg">
+        <h2 class="text-xl font-semibold">📧 Email Configuration</h2>
+        <span class="text-2xl">{{ showEmailConfig ? '−' : '+' }}</span>
+      </button>
+
+      <div v-if="showEmailConfig" class="p-6 border-t">
+        <div class="mb-4">
+          <p class="text-sm text-gray-600 mb-1">Reports are currently sent to:</p>
+          <p class="font-semibold text-lg">{{ getReportEmail() || 'No email configured' }}</p>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input v-model="newEmailAddress" type="email" placeholder="Enter custom email address"
+              class="border px-3 py-2 rounded flex-1 min-w-0 h-10" />
+            <button @click="updateReportEmail"
+              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap h-10">
+              Set Custom Email
+            </button>
+          </div>
+          <button @click="resetEmailToFirstUser"
+            class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700">
+            Reset to First User's Email
+          </button>
+        </div>
+      </div>
+    </section>
+    <div v-if="showHelp" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded shadow-lg max-w-md text-center">
+        <h2 class="text-2xl font-bold mb-4">Admin Help</h2>
+        <p class="mb-3">📧 <strong>Email Report:</strong> Sends a full attendance record to the configured email.</p>
+        <p class="mb-3">👥 <strong>User Management:</strong> Add, import, export, or delete users.</p>
+        <p class="mb-3">
+          ⚙️ <strong>Email Configuration:</strong> Choose where reports are sent. A daily summary is emailed
+          automatically on first login each day.</p>
+        <button @click="showHelp = false" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          Got it
+        </button>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script setup>
+import { useRouter } from 'vue-router'
+import { useLocalDb } from '~/composables/useLocalDb'
+import { useEmail } from '~/composables/useEmail'
+
+const router = useRouter()
+const { users, attendanceRefs, deleteUser, deleteAllUsers, currentUser, getCurrentUser, emailConfig, setReportEmail, getReportEmail, resetToFirstUserEmail } = useLocalDb()
+const { sendEmail } = useEmail()
+
 // Reactive current user for display                                                                                                                                                                               
-const currentUserData = computed(() => getCurrentUser())                                                                                                                                                           
-                                                                                                                                                                                                                   
-const searchQuery = ref('')                                                                                                                                                                                        
-const showUserManagement = ref(false)                                                                                                                                                                              
-const showEmailConfig = ref(false)                                                                                                                                                                                 
-const newEmailAddress = ref('')                                                                                                                                                                                    
-const fileInput = ref(null)                                                                                                                                                                                        
-                                                                                                                                                                                                                   
-const filteredUsers = computed(() => {                                                                                                                                                                             
-  if (!searchQuery.value) return users.value                                                                                                                                                                       
-  return users.value.filter(u => u.name.toLowerCase().includes(searchQuery.value.toLowerCase()))                                                                                                                   
-})                                                                                                                                                                                                                 
-                                                                                                                                                                                                                   
-const todayKeyPrefix = new Date().toISOString().slice(0,10)                                                                                                                                                        
-                                                                                                                                                                                                                   
-const todayLogs = computed(() => {                                                                                                                                                                                 
-  const logs = {}                                                                                                                                                                                                  
-  for (const key in attendanceRefs.value) {                                                                                                                                                                        
-    if (key.includes(todayKeyPrefix)) {                                                                                                                                                                            
-      logs[key] = attendanceRefs.value[key]                                                                                                                                                                        
-    }                                                                                                                                                                                                              
-  }                                                                                                                                                                                                                
-  return logs                                                                                                                                                                                                      
-})                                                                                                                                                                                                                 
-                                                                                                                                                                                                                   
-function getEmployeeNameFromKey(key) {                                                                                                                                                                             
-  return key.split(':')[1]                                                                                                                                                                                         
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function formatTime(iso) {                                                                                                                                                                                         
-  if (!iso) return ''                                                                                                                                                                                              
-  const d = new Date(iso)                                                                                                                                                                                          
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })                                                                                                                                          
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function goToHome() {                                                                                                                                                                                              
-  router.push('/')                                                                                                                                                                                                 
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function goToAddUser() {                                                                                                                                                                                           
-  router.push('/adduser')                                                                                                                                                                                          
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function triggerImport() {                                                                                                                                                                                         
-  fileInput.value.click()                                                                                                                                                                                          
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function exportUsers() {                                                                                                                                                                                           
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(users.value, null, 2))                                                                                                       
-  const downloadAnchor = document.createElement('a')                                                                                                                                                               
-  downloadAnchor.setAttribute("href", dataStr)                                                                                                                                                                     
-  downloadAnchor.setAttribute("download", "users.json")                                                                                                                                                            
-  document.body.appendChild(downloadAnchor)                                                                                                                                                                        
-  downloadAnchor.click()                                                                                                                                                                                           
-  downloadAnchor.remove()                                                                                                                                                                                          
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function handleImport(event) {                                                                                                                                                                                     
-  const file = event.target.files[0]                                                                                                                                                                               
-  if (!file) return                                                                                                                                                                                                
-                                                                                                                                                                                                                   
-  const reader = new FileReader()                                                                                                                                                                                  
-  reader.onload = e => {                                                                                                                                                                                           
-    try {                                                                                                                                                                                                          
-      const importedUsers = JSON.parse(e.target.result)                                                                                                                                                            
-      if (Array.isArray(importedUsers)) {                                                                                                                                                                          
-        users.value = importedUsers                                                                                                                                                                                
-        alert("Users imported successfully!")                                                                                                                                                                      
-      } else {                                                                                                                                                                                                     
-        alert("Invalid format. Expected an array.")                                                                                                                                                                
-      }                                                                                                                                                                                                            
-    } catch (err) {                                                                                                                                                                                                
-      alert("Error parsing JSON file.")                                                                                                                                                                            
-    }                                                                                                                                                                                                              
-  }                                                                                                                                                                                                                
-  reader.readAsText(file)                                                                                                                                                                                          
-                                                                                                                                                                                                                   
+const currentUserData = computed(() => getCurrentUser())
+
+const searchQuery = ref('')
+const showUserManagement = ref(false)
+const showEmailConfig = ref(false)
+const newEmailAddress = ref('')
+const fileInput = ref(null)
+
+const filteredUsers = computed(() => {
+  if (!searchQuery.value) return users.value
+  return users.value.filter(u => u.name.toLowerCase().includes(searchQuery.value.toLowerCase()))
+})
+
+const todayKeyPrefix = new Date().toISOString().slice(0, 10)
+
+const todayLogs = computed(() => {
+  const logs = {}
+  for (const key in attendanceRefs.value) {
+    if (key.includes(todayKeyPrefix)) {
+      logs[key] = attendanceRefs.value[key]
+    }
+  }
+  return logs
+})
+
+function getEmployeeNameFromKey(key) {
+  return key.split(':')[1]
+}
+
+function formatTime(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+const showHelp = ref(false)
+
+function goToHome() {
+  router.push('/')
+}
+
+function goToAddUser() {
+  router.push('/adduser')
+}
+
+function triggerImport() {
+  fileInput.value.click()
+}
+
+function exportUsers() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(users.value, null, 2))
+  const downloadAnchor = document.createElement('a')
+  downloadAnchor.setAttribute("href", dataStr)
+  downloadAnchor.setAttribute("download", "users.json")
+  document.body.appendChild(downloadAnchor)
+  downloadAnchor.click()
+  downloadAnchor.remove()
+}
+
+function handleImport(event) {
+  const file = event.target.files[0]
+  if (!file) return
+
+  const reader = new FileReader()
+  reader.onload = e => {
+    try {
+      const importedUsers = JSON.parse(e.target.result)
+      if (Array.isArray(importedUsers)) {
+        users.value = importedUsers
+        alert("Users imported successfully!")
+      } else {
+        alert("Invalid format. Expected an array.")
+      }
+    } catch (err) {
+      alert("Error parsing JSON file.")
+    }
+  }
+  reader.readAsText(file)
+
   // Reset the file input                                                                                                                                                                                          
-  event.target.value = ''                                                                                                                                                                                          
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function handleDeleteUser(name) {                                                                                                                                                                                  
-  const current = currentUserData.value                                                                                                                                                                            
-  console.log('Current user:', JSON.stringify(current))                                                                                                                                                            
-  console.log('Current user name:', current?.name)                                                                                                                                                                 
-  console.log('Trying to delete:', name)                                                                                                                                                                           
-  console.log('Names match:', current?.name === name)                                                                                                                                                              
-                                                                                                                                                                                                                   
-  if (current && current.name === name) {                                                                                                                                                                          
-    alert("You cannot delete yourself. Use 'Delete All Users' to reset.")                                                                                                                                          
-    return                                                                                                                                                                                                         
-  }                                                                                                                                                                                                                
-                                                                                                                                                                                                                   
-  if (confirm(`Are you sure you want to delete user "${name}"?`)) {                                                                                                                                                
-    deleteUser(name)                                                                                                                                                                                               
-  }                                                                                                                                                                                                                
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function confirmDeleteAllUsers() {                                                                                                                                                                                 
-  if (confirm("Are you sure you want to delete all users?")) {                                                                                                                                                     
-    deleteAllUsers()                                                                                                                                                                                               
-  }                                                                                                                                                                                                                
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-async function emailAttendanceLogs(event) {                                                                                                                                                                        
-  const reportEmail = getReportEmail()                                                                                                                                                                             
-  if (!reportEmail) {                                                                                                                                                                                              
-    alert("No email address configured. Please set up an email address in the Email Configuration section.")                                                                                                       
-    return                                                                                                                                                                                                         
-  }                                                                                                                                                                                                                
-                                                                                                                                                                                                                   
-  try {                                                                                                                                                                                                            
+  event.target.value = ''
+}
+
+function handleDeleteUser(name) {
+  const current = currentUserData.value
+  console.log('Current user:', JSON.stringify(current))
+  console.log('Current user name:', current?.name)
+  console.log('Trying to delete:', name)
+  console.log('Names match:', current?.name === name)
+
+  if (current && current.name === name) {
+    alert("You cannot delete yourself. Use 'Delete All Users' to reset.")
+    return
+  }
+
+  if (confirm(`Are you sure you want to delete user "${name}"?`)) {
+    deleteUser(name)
+  }
+}
+
+function confirmDeleteAllUsers() {
+  if (confirm("Are you sure you want to delete all users?")) {
+    deleteAllUsers()
+  }
+}
+
+async function emailAllAttendanceLogs(event) {
+  const reportEmail = getReportEmail()
+  if (!reportEmail) {
+    alert("No email address configured. Please set up an email address in the Email Configuration section.")
+    return
+  }
+
+  try {
+    // UI feedback
+    const button = event?.target
+    if (button) {
+      const originalText = button.textContent
+      button.textContent = 'Sending...'
+      button.disabled = true
+    }
+
+    // Build the email content
+    let emailBody = "Full Attendance Report\n\n"
+
+    if (Object.keys(attendanceRefs.value).length === 0) {
+      emailBody += "No attendance records found.\n"
+    } else {
+      for (const [key, logs] of Object.entries(attendanceRefs.value)) {
+        const employeeName = getEmployeeNameFromKey(key)
+        emailBody += `${employeeName}:\n`
+        logs.forEach(log => {
+          const time = formatTime(log.time)
+          emailBody += `  - ${log.status} at ${time}\n`
+        })
+        emailBody += "\n"
+      }
+    }
+
+    emailBody += `\nReport generated on ${new Date().toLocaleString()}`
+
+    // Send email
+    const subject = `Full Attendance Report - ${new Date().toLocaleDateString()}`
+    const result = await sendEmail(reportEmail, 'Admin', subject, emailBody)
+
+    if (result.success) {
+      alert('Full attendance report sent successfully!')
+    } else {
+      throw new Error(result.error)
+    }
+
+    if (button) {
+      button.textContent = '📧 Email Report'
+      button.disabled = false
+    }
+
+  } catch (error) {
+    console.error('Failed to send email:', error)
+    alert('Failed to send email. Please try again.')
+
+    const button = event?.target
+    if (button) {
+      button.textContent = '📧 Email Report'
+      button.disabled = false
+    }
+  }
+}
+
+
+async function emailAttendanceLogs(event) {
+  const reportEmail = getReportEmail()
+  if (!reportEmail) {
+    alert("No email address configured. Please set up an email address in the Email Configuration section.")
+    return
+  }
+
+  try {
     // Show loading state                                                                                                                                                                                          
-    const button = event.target                                                                                                                                                                                    
-    const originalText = button.textContent                                                                                                                                                                        
-    button.textContent = 'Sending...'                                                                                                                                                                              
-    button.disabled = true                                                                                                                                                                                         
-                                                                                                                                                                                                                   
+    const button = event.target
+    const originalText = button.textContent
+    button.textContent = 'Sending...'
+    button.disabled = true
+
     // Format today's attendance logs for email                                                                                                                                                                    
-    const emailBody = formatAttendanceForEmail()                                                                                                                                                                   
-    const subject = `Attendance Report - ${new Date().toLocaleDateString()}`                                                                                                                                       
-                                                                                                                                                                                                                   
+    const emailBody = formatAttendanceForEmail()
+    const subject = `Attendance Report - ${new Date().toLocaleDateString()}`
+
     // Send email using the composable                                                                                                                                                                             
-    const result = await sendEmail(                                                                                                                                                                                
-      reportEmail,                                                                                                                                                                                                 
-      'Admin',                                                                                                                                                                                                     
-      subject,                                                                                                                                                                                                     
-      emailBody                                                                                                                                                                                                    
-    )                                                                                                                                                                                                              
-                                                                                                                                                                                                                   
-    if (result.success) {                                                                                                                                                                                          
-      alert('Attendance report sent successfully!')                                                                                                                                                                
-    } else {                                                                                                                                                                                                       
-      throw new Error(result.error)                                                                                                                                                                                
-    }                                                                                                                                                                                                              
-                                                                                                                                                                                                                   
+    const result = await sendEmail(
+      reportEmail,
+      'Admin',
+      subject,
+      emailBody
+    )
+
+    if (result.success) {
+      alert('Attendance report sent successfully!')
+    } else {
+      throw new Error(result.error)
+    }
+
     // Restore button state                                                                                                                                                                                        
-    button.textContent = originalText                                                                                                                                                                              
-    button.disabled = false                                                                                                                                                                                        
-                                                                                                                                                                                                                   
-  } catch (error) {                                                                                                                                                                                                
-    console.error('Failed to send email:', error)                                                                                                                                                                  
-    alert('Failed to send email. Please try again.')                                                                                                                                                               
-                                                                                                                                                                                                                   
+    button.textContent = originalText
+    button.disabled = false
+
+  } catch (error) {
+    console.error('Failed to send email:', error)
+    alert('Failed to send email. Please try again.')
+
     // Restore button state                                                                                                                                                                                        
-    const button = event.target                                                                                                                                                                                    
-    button.textContent = '📧 Email Report'                                                                                                                                                                         
-    button.disabled = false                                                                                                                                                                                        
-  }                                                                                                                                                                                                                
+    const button = event.target
+    button.textContent = '📧 Email Report'
+    button.disabled = false
+  }
+}
+
+function formatAttendanceForEmail() {
+  const today = new Date().toLocaleDateString()
+  let emailContent = `Attendance Report for ${today}\n\n`
+
+  if (Object.keys(todayLogs.value).length === 0) {
+    emailContent += "No attendance recorded today.\n"
+  } else {
+    for (const [key, logs] of Object.entries(todayLogs.value)) {
+      const employeeName = getEmployeeNameFromKey(key)
+      emailContent += `${employeeName}:\n`
+
+      logs.forEach(log => {
+        const time = formatTime(log.time)
+        emailContent += `  - ${log.status} at ${time}\n`
+      })
+      emailContent += "\n"
+    }
+  }
+
+  emailContent += `\nReport generated on ${new Date().toLocaleString()}`
+  return emailContent
+}
+
+function updateReportEmail() {
+  if (!newEmailAddress.value) {
+    alert('Please enter a valid email address.')
+    return
+  }
+
+  setReportEmail(newEmailAddress.value)
+  newEmailAddress.value = ''
+  showEmailConfig.value = false
+  alert('Email address updated successfully!')
+}
+
+function resetEmailToFirstUser() {
+  resetToFirstUserEmail()
+  showEmailConfig.value = false
+  alert('Email reset to first user\'s email address.')
 }                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function formatAttendanceForEmail() {                                                                                                                                                                              
-  const today = new Date().toLocaleDateString()                                                                                                                                                                    
-  let emailContent = `Attendance Report for ${today}\n\n`                                                                                                                                                          
-                                                                                                                                                                                                                   
-  if (Object.keys(todayLogs.value).length === 0) {                                                                                                                                                                 
-    emailContent += "No attendance recorded today.\n"                                                                                                                                                              
-  } else {                                                                                                                                                                                                         
-    for (const [key, logs] of Object.entries(todayLogs.value)) {                                                                                                                                                   
-      const employeeName = getEmployeeNameFromKey(key)                                                                                                                                                             
-      emailContent += `${employeeName}:\n`                                                                                                                                                                         
-                                                                                                                                                                                                                   
-      logs.forEach(log => {                                                                                                                                                                                        
-        const time = formatTime(log.time)                                                                                                                                                                          
-        emailContent += `  - ${log.status} at ${time}\n`                                                                                                                                                           
-      })                                                                                                                                                                                                           
-      emailContent += "\n"                                                                                                                                                                                         
-    }                                                                                                                                                                                                              
-  }                                                                                                                                                                                                                
-                                                                                                                                                                                                                   
-  emailContent += `\nReport generated on ${new Date().toLocaleString()}`                                                                                                                                           
-  return emailContent                                                                                                                                                                                              
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function updateReportEmail() {                                                                                                                                                                                     
-  if (!newEmailAddress.value) {                                                                                                                                                                                    
-    alert('Please enter a valid email address.')                                                                                                                                                                   
-    return                                                                                                                                                                                                         
-  }                                                                                                                                                                                                                
-                                                                                                                                                                                                                   
-  setReportEmail(newEmailAddress.value)                                                                                                                                                                            
-  newEmailAddress.value = ''                                                                                                                                                                                       
-  showEmailConfig.value = false                                                                                                                                                                                    
-  alert('Email address updated successfully!')                                                                                                                                                                     
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-function resetEmailToFirstUser() {                                                                                                                                                                                 
-  resetToFirstUserEmail()                                                                                                                                                                                          
-  showEmailConfig.value = false                                                                                                                                                                                    
-  alert('Email reset to first user\'s email address.')                                                                                                                                                             
-}                                                                                                                                                                                                                  
-</script>                                                                                                                                                                                                          
-                                                                                                                                                                                                                   
-<style scoped>                                                                                                                                                                                                     
-@keyframes move {                                                                                                                                                                                                  
-  100% {                                                                                                                                                                                                           
-    transform: translate3d(0, 0, 1px) rotate(360deg);                                                                                                                                                              
-  }                                                                                                                                                                                                                
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-.background {                                                                                                                                                                                                      
-  position: fixed;                                                                                                                                                                                                 
-  width: 100vw;                                                                                                                                                                                                    
-  height: 100vh;                                                                                                                                                                                                   
-  top: 0;                                                                                                                                                                                                          
-  left: 0;                                                                                                                                                                                                         
-  background: #4CB8B6;                                                                                                                                                                                             
-  overflow: hidden;                                                                                                                                                                                                
-  z-index: -10;                                                                                                                                                                                                    
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-.ball {                                                                                                                                                                                                            
-  position: absolute;                                                                                                                                                                                              
-  width: 20vmin;                                                                                                                                                                                                   
-  height: 20vmin;                                                                                                                                                                                                  
-  border-radius: 50%;                                                                                                                                                                                              
-  backface-visibility: hidden;                                                                                                                                                                                     
-  animation: move linear infinite;                                                                                                                                                                                 
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-.ball:nth-child(odd) {                                                                                                                                                                                             
-    color: #006D5B;                                                                                                                                                                                                
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-.ball:nth-child(even) {                                                                                                                                                                                            
-    color: #FF6F61;                                                                                                                                                                                                
-}                                                                                                                                                                                                                  
-                                                                                                                                                                                                                   
-.ball:nth-child(1) {                                                                                                                                                                                               
-  top: 77%;                                                                                                                                                                                                        
-  left: 88%;                                                                                                                                                                                                       
-  animation-duration: 40s;                                                                                                                                                                                         
-  animation-delay: -3s;                                                                                                                                                                                            
-  transform-origin: 16vw -2vh;                                                                                                                                                                                     
-  box-shadow: 40vmin 0 5.703076368487546vmin currentColor;                                                                                                                                                         
-}                                                                                                                                                                                                                  
-.ball:nth-child(2) {                                                                                                                                                                                               
-  top: 42%;                                                                                                                                                                                                        
-  left: 2%;                                                                                                                                                                                                        
-  animation-duration: 53s;                                                                                                                                                                                         
-  animation-delay: -29s;                                                                                                                                                                                           
-  transform-origin: -19vw 21vh;                                                                                                                                                                                    
-  box-shadow: -40vmin 0 5.17594621519026vmin currentColor;                                                                                                                                                         
-}                                                                                                                                                                                                                  
-.ball:nth-child(3) {                                                                                                                                                                                               
-  top: 28%;                                                                                                                                                                                                        
-  left: 18%;                                                                                                                                                                                                       
-  animation-duration: 49s;                                                                                                                                                                                         
-  animation-delay: -8s;                                                                                                                                                                                            
-  transform-origin: -22vw 3vh;                                                                                                                                                                                     
-  box-shadow: 40vmin 0 5.248179047256236vmin currentColor;                                                                                                                                                         
-}                                                                                                                                                                                                                  
-.ball:nth-child(4) {                                                                                                                                                                                               
-  top: 50%;                                                                                                                                                                                                        
-  left: 79%;                                                                                                                                                                                                       
-  animation-duration: 26s;                                                                                                                                                                                         
-  animation-delay: -21s;                                                                                                                                                                                           
-  transform-origin: -17vw -6vh;                                                                                                                                                                                    
-  box-shadow: 40vmin 0 5.279749632220298vmin currentColor;                                                                                                                                                         
-}                                                                                                                                                                                                                  
-.ball:nth-child(5) {                                                                                                                                                                                               
-  top: 46%;                                                                                                                                                                                                        
-  left: 15%;                                                                                                                                                                                                       
-  animation-duration: 36s;                                                                                                                                                                                         
-  animation-delay: -40s;                                                                                                                                                                                           
-  transform-origin: 4vw 0vh;                                                                                                                                                                                       
-  box-shadow: -40vmin 0 5.964309466052033vmin currentColor;                                                                                                                                                        
-}                                                                                                                                                                                                                  
-.ball:nth-child(6) {                                                                                                                                                                                               
-  top: 77%;                                                                                                                                                                                                        
-  left: 16%;                                                                                                                                                                                                       
-  animation-duration: 31s;                                                                                                                                                                                         
-  animation-delay: -10s;                                                                                                                                                                                           
-  transform-origin: 18vw 4vh;                                                                                                                                                                                      
-  box-shadow: 40vmin 0 5.178483653434181vmin currentColor;                                                                                                                                                         
-}                                                                                                                                                                                                                  
-.ball:nth-child(7) {                                                                                                                                                                                               
-  top: 22%;                                                                                                                                                                                                        
-  left: 17%;                                                                                                                                                                                                       
-  animation-duration: 55s;                                                                                                                                                                                         
-  animation-delay: -6s;                                                                                                                                                                                            
-  transform-origin: 1vw -23vh;                                                                                                                                                                                     
-  box-shadow: -40vmin 0 5.703026794398318vmin currentColor;                                                                                                                                                        
-}                                                                                                                                                                                                                  
-.ball:nth-child(8) {                                                                                                                                                                                               
-  top: 41%;                                                                                                                                                                                                        
-  left: 47%;                                                                                                                                                                                                       
-  animation-duration: 43s;                                                                                                                                                                                         
-  animation-delay: -28s;                                                                                                                                                                                           
-  transform-origin: 25vw -3vh;                                                                                                                                                                                     
-  box-shadow: 40vmin 0 5.196265905749415vmin currentColor;                                                                                                                                                         
-}                                                                                                                                                                                                                  
-</style>        
+</script>
+
+<style scoped>
+@keyframes move {
+  100% {
+    transform: translate3d(0, 0, 1px) rotate(360deg);
+  }
+}
+
+.background {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background: #4CB8B6;
+  overflow: hidden;
+  z-index: -10;
+}
+
+.ball {
+  position: absolute;
+  width: 20vmin;
+  height: 20vmin;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  animation: move linear infinite;
+}
+
+.ball:nth-child(odd) {
+  color: #006D5B;
+}
+
+.ball:nth-child(even) {
+  color: #FF6F61;
+}
+
+.ball:nth-child(1) {
+  top: 77%;
+  left: 88%;
+  animation-duration: 40s;
+  animation-delay: -3s;
+  transform-origin: 16vw -2vh;
+  box-shadow: 40vmin 0 5.703076368487546vmin currentColor;
+}
+
+.ball:nth-child(2) {
+  top: 42%;
+  left: 2%;
+  animation-duration: 53s;
+  animation-delay: -29s;
+  transform-origin: -19vw 21vh;
+  box-shadow: -40vmin 0 5.17594621519026vmin currentColor;
+}
+
+.ball:nth-child(3) {
+  top: 28%;
+  left: 18%;
+  animation-duration: 49s;
+  animation-delay: -8s;
+  transform-origin: -22vw 3vh;
+  box-shadow: 40vmin 0 5.248179047256236vmin currentColor;
+}
+
+.ball:nth-child(4) {
+  top: 50%;
+  left: 79%;
+  animation-duration: 26s;
+  animation-delay: -21s;
+  transform-origin: -17vw -6vh;
+  box-shadow: 40vmin 0 5.279749632220298vmin currentColor;
+}
+
+.ball:nth-child(5) {
+  top: 46%;
+  left: 15%;
+  animation-duration: 36s;
+  animation-delay: -40s;
+  transform-origin: 4vw 0vh;
+  box-shadow: -40vmin 0 5.964309466052033vmin currentColor;
+}
+
+.ball:nth-child(6) {
+  top: 77%;
+  left: 16%;
+  animation-duration: 31s;
+  animation-delay: -10s;
+  transform-origin: 18vw 4vh;
+  box-shadow: 40vmin 0 5.178483653434181vmin currentColor;
+}
+
+.ball:nth-child(7) {
+  top: 22%;
+  left: 17%;
+  animation-duration: 55s;
+  animation-delay: -6s;
+  transform-origin: 1vw -23vh;
+  box-shadow: -40vmin 0 5.703026794398318vmin currentColor;
+}
+
+.ball:nth-child(8) {
+  top: 41%;
+  left: 47%;
+  animation-duration: 43s;
+  animation-delay: -28s;
+  transform-origin: 25vw -3vh;
+  box-shadow: 40vmin 0 5.196265905749415vmin currentColor;
+}
+</style>

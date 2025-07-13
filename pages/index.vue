@@ -109,7 +109,7 @@ import { useLocalDb } from '~/composables/useLocalDb'
 import * as faceapi from 'face-api.js'
 
 const router = useRouter()
-const { getAllUsers, addAttendanceLog, getCurrentStatus, setCurrentUser } = useLocalDb()
+const { getAllUsers, addAttendanceLog, getCurrentStatus, setCurrentUser, getReportEmail } = useLocalDb()
 
 const faceCam = ref(null)
 const showOverlay = ref(true)
@@ -280,6 +280,7 @@ function normalClockFlow(user) {
 
   currentAction.value = newStatus
   showModal.value = true
+   checkAndSendDailyReportOnLogin()
 }
 
 function showAdminModal(user) {
@@ -324,6 +325,58 @@ function getTimeGreeting() {
     return 'Good evening'
   }
 }
+
+async function checkAndSendDailyReportOnLogin() {
+  const todayStr = new Date().toISOString().slice(0,10)
+  const lastReportDate = localStorage.getItem('lastDailyReportDate')
+
+  const reportEmail = getReportEmail()
+  if (!reportEmail) {
+    console.log('No email configured for daily report.')
+    return
+  }
+
+  let emailBody = `Attendance Report since ${lastReportDate || 'the beginning'}\n\n`
+  let foundAny = false
+
+  for (const [key, logs] of Object.entries(useLocalDb().attendanceRefs.value)) {
+    // key format: '2025-07-13:John'
+    const recordDate = key.slice(0,10)
+
+    // If lastReportDate is null, include everything
+    if (lastReportDate && recordDate <= lastReportDate) continue
+
+    foundAny = true
+    const employeeName = key.split(':')[1]
+    emailBody += `${employeeName} on ${recordDate}:\n`
+    logs.forEach(log => {
+      const time = new Date(log.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      emailBody += `  - ${log.status} at ${time}\n`
+    })
+    emailBody += "\n"
+  }
+
+  if (!foundAny) {
+    emailBody += "No attendance records since last report.\n"
+  }
+
+  emailBody += `\nReport generated on ${new Date().toLocaleString()}`
+
+  try {
+    const subject = `Attendance Report since ${lastReportDate || 'the beginning'}`
+    const result = await useEmail().sendEmail(reportEmail, 'System', subject, emailBody)
+
+    if (result.success) {
+      console.log('Attendance report sent successfully.')
+      localStorage.setItem('lastDailyReportDate', todayStr)
+    } else {
+      console.error('Failed to send report:', result.error)
+    }
+  } catch (error) {
+    console.error('Daily report failed:', error)
+  }
+}
+
 </script>
 
 <style scoped>

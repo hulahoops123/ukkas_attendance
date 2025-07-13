@@ -11,6 +11,14 @@ export default defineNuxtConfig({
   devServer: {
     https: true
   },
+   app: {
+    head: {
+      title: 'Therapist Attendance',
+      meta: [
+        { name: 'description', content: 'Track therapist attendance for kids with ease.' }
+      ]
+    }
+  },
   pwa: {
     manifest: {
       name: "Therapist Atendance",
