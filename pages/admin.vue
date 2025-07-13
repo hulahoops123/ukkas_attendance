@@ -11,7 +11,6 @@
       <span class="ball"></span>                                                                                                                                                                                   
     </div>                                                                                                                                                                                                         
                                                                                                                                                                                                                    
-    <!-- Header -->                                                                                                                                                                                                
     <div class="flex justify-between items-center mb-6">                                                                                                                                                           
       <h1 class="text-3xl font-bold">Admin Dashboard</h1>                                                                                                                                                          
       <button @click="goToHome"                                                                                                                                                                                    
@@ -20,7 +19,6 @@
       </button>                                                                                                                                                                                                    
     </div>                                                                                                                                                                                                         
                                                                                                                                                                                                                    
-    <!-- Current User Status -->                                                                                                                                                                                   
     <div class="bg-white bg-opacity-90 p-4 rounded-lg mb-6">                                                                                                                                                       
       <p class="text-lg">                                                                                                                                                                                          
         <span class="font-semibold">Current User:</span>                                                                                                                                                           
@@ -28,7 +26,6 @@
       </p>                                                                                                                                                                                                         
     </div>                                                                                                                                                                                                         
                                                                                                                                                                                                                    
-    <!-- Main Display: Today's Attendance Logs -->                                                                                                                                                                 
     <section class="bg-white bg-opacity-90 p-6 rounded-lg mb-6">                                                                                                                                                   
       <div class="flex justify-between items-center mb-4">                                                                                                                                                         
         <h2 class="text-2xl font-semibold">Today's Attendance Logs</h2>                                                                                                                                            
@@ -56,7 +53,6 @@
       </div>                                                                                                                                                                                                       
     </section>                                                                                                                                                                                                     
                                                                                                                                                                                                                    
-    <!-- Collapsible Section: User Management -->                                                                                                                                                                  
     <section class="bg-white bg-opacity-90 rounded-lg mb-6">                                                                                                                                                       
       <button @click="showUserManagement = !showUserManagement"                                                                                                                                                    
               class="w-full p-4 text-left flex justify-between items-center hover:bg-gray-50 rounded-lg">                                                                                                          
@@ -65,7 +61,6 @@
       </button>                                                                                                                                                                                                    
                                                                                                                                                                                                                    
       <div v-if="showUserManagement" class="p-6 border-t">                                                                                                                                                         
-        <!-- User Management Controls -->                                                                                                                                                                          
         <div class="flex flex-wrap gap-3 mb-4">                                                                                                                                                                    
           <input v-model="searchQuery" placeholder="Search users..."                                                                                                                                               
                  class="border px-3 py-2 rounded flex-1 min-w-0" />                                                                                                                                                
@@ -75,7 +70,6 @@
           </button>                                                                                                                                                                                                
         </div>                                                                                                                                                                                                     
                                                                                                                                                                                                                    
-        <!-- Import/Export Controls -->                                                                                                                                                                            
         <div class="flex flex-wrap gap-3 mb-4 p-3 bg-gray-50 rounded">                                                                                                                                             
           <button @click="exportUsers"                                                                                                                                                                             
                   class="bg-pink-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap">                                                                                                            
@@ -94,7 +88,6 @@
           </button>                                                                                                                                                                                                
         </div>                                                                                                                                                                                                     
                                                                                                                                                                                                                    
-        <!-- User List -->                                                                                                                                                                                         
         <div>                                                                                                                                                                                                      
           <h3 class="font-semibold mb-3">                                                                                                                                                                          
             {{ searchQuery ? `Search results for '${searchQuery}'` : 'All Users' }}                                                                                                                                
@@ -122,7 +115,6 @@
       </div>                                                                                                                                                                                                       
     </section>                                                                                                                                                                                                     
                                                                                                                                                                                                                    
-    <!-- Collapsible Section: Email Configuration -->                                                                                                                                                              
     <section class="bg-white bg-opacity-90 rounded-lg">                                                                                                                                                            
       <button @click="showEmailConfig = !showEmailConfig"                                                                                                                                                          
               class="w-full p-4 text-left flex justify-between items-center hover:bg-gray-50 rounded-lg">                                                                                                          

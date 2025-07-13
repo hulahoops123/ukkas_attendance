@@ -1,18 +1,12 @@
 <template>
   <div class="relative w-full h-screen overflow-hidden flex items-center justify-center">
-    <div
-      v-for="(letter, index) in letters"
-      :key="index"
-      class="absolute font-bold text-6xl transition-none"
-      :class="[
-        letter.circle ? 'w-20 h-20 rounded-full flex items-center justify-center' : '',
-      ]"
-      :style="{
+    <div v-for="(letter, index) in letters" :key="index" class="absolute font-bold text-6xl transition-none" :class="[
+      letter.circle ? 'w-20 h-20 rounded-full flex items-center justify-center' : '',
+    ]" :style="{
         color: letter.circle ? '#E5E7EB' : letter.color,
         backgroundColor: letter.circle ? letter.color : 'transparent',
         transform: `translate(${positions[index].x}px, ${positions[index].y}px) rotate(${angles[index]}deg)`
-      }"
-    >
+      }">
       {{ letter.char }}
     </div>
   </div>
@@ -22,19 +16,21 @@
 import { reactive, onMounted, onUnmounted } from 'vue'
 
 const letters = [
-  { char: 'K', x: -240, y: 0, color: '#0AAA0A', circle: true },
-  { char: 'I', x: -80, y: 0,  color: '#00AEEF', circle: true },
-  { char: 'D', x: 0, y: 0,   color: '#F75A79', circle: true },
-  { char: 'S', x: 80, y: 0,  color: '#FFD600', circle: true },
-  { char: 'A', x: 0, y: -160, color: '#0AAA0A', circle: false },
-  { char: 'U', x: 0,  y: -80, color: '#FFD600', circle: false },
-  { char: 'L', x: 0, y: 80, color: '#F75A79', circle: false },
-  { char: 'T', x: 0, y: 160, color: '#F75A79', circle: false },
-  { char: 'S', x: 0, y: 240, color: '#FF9800', circle: false }
+  { char: 'K', x: -160, y: 0, color: '#0AAA0A', circle: true },
+  { char: 'I', x: -80, y: 0, color: '#00AEEF', circle: true },
+  { char: 'D', x: 0, y: 0, color: '#F75A79', circle: true },
+  { char: 'S', x: 80, y: 0, color: '#FFD600', circle: true },
+
+  { char: 'A', x: 0, y: -80, color: '#0AAA0A', circle: false },
+  { char: 'U', x: 0, y: 80, color: '#FFD600', circle: false },
+  { char: 'L', x: 0, y: 160, color: '#F75A79', circle: false },
+  { char: 'T', x: 0, y: 240, color: '#F75A79', circle: false },
+  { char: 'S', x: 0, y: 320, color: '#FF9800', circle: false }
 ]
 
+
 const positions = reactive(letters.map(l => ({ x: l.x, y: l.y })))
-const velocities = reactive(letters.map(() => ({ 
+const velocities = reactive(letters.map(() => ({
   vx: (Math.random() - 0.5) * 0.4, // reduced from *1
   vy: (Math.random() - 0.5) * 0.4
 })))
@@ -45,9 +41,8 @@ let animationId = null
 let isAnimating = false
 let startTime = null
 const LETTER_SIZE = 80
-const CYCLE_DURATION = 20000
-const RETURN_START_TIME = 15000
-
+const CYCLE_DURATION = 40000
+const RETURN_START_TIME = 30000
 function startCycle() {
   if (isAnimating) return
   isAnimating = true
@@ -65,9 +60,9 @@ function startCycle() {
     if (elapsed >= CYCLE_DURATION) {
       startTime = currentTime
       letters.forEach((_, i) => {
-        velocities[i].vx = (Math.random() - 0.5) * 0.4
-        velocities[i].vy = (Math.random() - 0.5) * 0.4
-        rotationVelocities[i] = (Math.random() - 0.5) * 1
+        velocities[i].vx = (Math.random() - 0.5) * 1.2
+        velocities[i].vy = (Math.random() - 0.5) * 1.2
+        rotationVelocities[i] = (Math.random() - 0.5) * 3
       })
     }
 
@@ -77,28 +72,28 @@ function startCycle() {
         positions[i].x += velocities[i].vx
         positions[i].y += velocities[i].vy
         angles[i] += rotationVelocities[i]
-        
+
         velocities[i].vx *= 0.995 // more damping
         velocities[i].vy *= 0.995
         rotationVelocities[i] *= 0.995
 
         // Bounce
-        if (positions[i].x <= -window.innerWidth/2 + LETTER_SIZE/2) {
-          positions[i].x = -window.innerWidth/2 + LETTER_SIZE/2
+        if (positions[i].x <= -window.innerWidth / 2 + LETTER_SIZE / 2) {
+          positions[i].x = -window.innerWidth / 2 + LETTER_SIZE / 2
           velocities[i].vx = Math.abs(velocities[i].vx)
           rotationVelocities[i] += (Math.random() - 0.5) * 1.5
-        } else if (positions[i].x >= window.innerWidth/2 - LETTER_SIZE/2) {
-          positions[i].x = window.innerWidth/2 - LETTER_SIZE/2
+        } else if (positions[i].x >= window.innerWidth / 2 - LETTER_SIZE / 2) {
+          positions[i].x = window.innerWidth / 2 - LETTER_SIZE / 2
           velocities[i].vx = -Math.abs(velocities[i].vx)
           rotationVelocities[i] += (Math.random() - 0.5) * 1.5
         }
 
-        if (positions[i].y <= -window.innerHeight/2 + LETTER_SIZE/2) {
-          positions[i].y = -window.innerHeight/2 + LETTER_SIZE/2
+        if (positions[i].y <= -window.innerHeight / 2 + LETTER_SIZE / 2) {
+          positions[i].y = -window.innerHeight / 2 + LETTER_SIZE / 2
           velocities[i].vy = Math.abs(velocities[i].vy)
           rotationVelocities[i] += (Math.random() - 0.5) * 1.5
-        } else if (positions[i].y >= window.innerHeight/2 - LETTER_SIZE/2) {
-          positions[i].y = window.innerHeight/2 - LETTER_SIZE/2
+        } else if (positions[i].y >= window.innerHeight / 2 - LETTER_SIZE / 2) {
+          positions[i].y = window.innerHeight / 2 - LETTER_SIZE / 2
           velocities[i].vy = -Math.abs(velocities[i].vy)
           rotationVelocities[i] += (Math.random() - 0.5) * 1.5
         }
@@ -122,17 +117,17 @@ function startCycle() {
 
             const normalX = dx / distance
             const normalY = dy / distance
-            
+
             const relativeVelocityX = velocities[i].vx - velocities[j].vx
             const relativeVelocityY = velocities[i].vy - velocities[j].vy
-            
+
             const velocityAlongNormal = relativeVelocityX * normalX + relativeVelocityY * normalY
-            
+
             if (velocityAlongNormal > 0) continue
-            
+
             const restitution = 0.1 // less bouncy
             const impulse = -(1 + restitution) * velocityAlongNormal * 0.5 // extra damp
-            
+
             velocities[i].vx += impulse * normalX
             velocities[i].vy += impulse * normalY
             velocities[j].vx -= impulse * normalX

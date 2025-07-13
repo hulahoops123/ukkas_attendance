@@ -2,36 +2,65 @@
   <div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
     <div class="container mx-auto px-6 py-8">
       <div class="flex items-center justify-between mb-8">
-        <h1 class="text-4xl font-bold text-gray-800">Add New User</h1>
-        <button @click="goHome" 
-                class="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+        <h1 class="text-4xl font-bold text-gray-800">New User</h1>
+        <button @click="goHome"
+          class="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+            </path>
           </svg>
           Home
         </button>
       </div>
 
       <div class="flex flex-col items-center">
+<div v-if="!hasAdmin() && step === 1 && showOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center">
+    <h3 class="text-xl font-bold mb-4 text-gray-800">🎉 You’re kind of a big deal!</h3>
+    <p class="text-gray-700 mb-4">
+      You’re setting up the first admin. That means you’ll be adding all other users. 
+      It’s smart to add another admin later for backup — you know, just in case you decide to take a vacation 🏖️.
+    </p>
+    <div class="flex items-center justify-center mb-4">
+      <input type="checkbox" id="understood" v-model="understood" class="h-5 w-5 text-green-600 border-gray-300 rounded mr-2">
+      <label for="understood" class="text-gray-800 text-sm">I understand my mighty responsibilities</label>
+    </div>
+    <button @click="showOverlay = false"
+            :disabled="!understood"
+            class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed">
+      Let’s go!
+    </button>
+  </div>
+</div>
+
+
         <div v-if="step === 1" class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
           <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Step 1: Face Recognition Setup</h2>
-          <p class="text-gray-600 text-center mb-6">Position your face in the camera and capture 5 photos for recognition</p>
-          
+          <p class="text-gray-600 text-center mb-6">Position your face in the camera and capture 5 photos for
+            recognition</p>
           <div class="flex flex-col items-center">
             <FaceCamera ref="faceCam" @faceFound="faceInFrame = true" @faceLost="faceInFrame = false" />
-            <button 
-              @click="captureFace"
-              :disabled="!faceInFrame"
-              class="mt-6 px-8 py-3 rounded-lg font-semibold text-lg transition-colors shadow-md
+                <p class="mt-4 text-gray-600 text-center text-sm min-h-[1.5rem]">
+      <template v-if="!faceInFrame">
+        Searching for face...
+      </template>
+      <template v-else-if="captures < 5">
+        Hold still — ready to capture ({{ captures }}/5)
+      </template>
+      <template v-else>
+        All photos captured!
+      </template>
+    </p>
+            <button @click="captureFace" :disabled="!faceInFrame" class="mt-6 px-8 py-3 rounded-lg font-semibold text-lg transition-colors shadow-md
                      bg-blue-600 text-white hover:bg-blue-700
                      disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed disabled:shadow-none">
-              {{ faceInFrame ? `Capture Face (${captures}/5)` : 'Position your face in frame' }}
+              {{ `Capture Face (${captures}/5)` }}
             </button>
-            
+
             <div class="mt-4 flex gap-2">
-              <div v-for="i in 5" :key="i" 
-                   :class="i <= captures ? 'bg-blue-600' : 'bg-gray-200'"
-                   class="w-3 h-3 rounded-full transition-colors"></div>
+              <div v-for="i in 5" :key="i" :class="i <= captures ? 'bg-blue-600' : 'bg-gray-200'"
+                class="w-3 h-3 rounded-full transition-colors"></div>
             </div>
           </div>
         </div>
@@ -39,55 +68,55 @@
         <div v-else-if="step === 2" class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
           <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Step 2: User Information</h2>
           <p class="text-gray-600 text-center mb-6">Enter your details to complete registration</p>
-          
+
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-              <input v-model="userName" type="text" placeholder="Enter your full name" 
-                     class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
+              <input v-model="userName" type="text" placeholder="Enter your full name"
+                class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
             </div>
-            
+
             <div v-if="!hasAdmin()">
               <label class="block text-sm font-medium text-gray-700 mb-2">PIN</label>
-              <input v-model="pin" type="password" placeholder="Create a PIN" 
-                     class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
+              <input v-model="pin" type="password" placeholder="Create a PIN"
+                class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
             </div>
-            
+
             <div v-if="!hasAdmin()">
               <label class="block text-sm font-medium text-gray-700 mb-2">Confirm PIN</label>
-              <input v-model="pinConfirm" type="password" placeholder="Confirm your PIN" 
-                     class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
+              <input v-model="pinConfirm" type="password" placeholder="Confirm your PIN"
+                class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-              <input v-model="email" type="email" placeholder="Enter your email" 
-                     class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
+              <input v-model="email" type="email" placeholder="Enter your email"
+                class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
             </div>
-            
+
             <div v-if="hasAdmin()" class="flex items-center">
-              <input v-model="isAdminUser" type="checkbox" id="adminCheckbox" 
-                     class="mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded" />
+              <input v-model="isAdminUser" type="checkbox" id="adminCheckbox"
+                class="mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded" />
               <label for="adminCheckbox" class="text-sm font-medium text-gray-700">Make this user an admin</label>
             </div>
-            
+
             <div v-if="hasAdmin() && isAdminUser">
               <label class="block text-sm font-medium text-gray-700 mb-2">PIN</label>
-              <input v-model="pin" type="password" placeholder="Create a PIN" 
-                     class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
+              <input v-model="pin" type="password" placeholder="Create a PIN"
+                class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
             </div>
-            
+
             <div v-if="hasAdmin() && isAdminUser">
               <label class="block text-sm font-medium text-gray-700 mb-2">Confirm PIN</label>
-              <input v-model="pinConfirm" type="password" placeholder="Confirm your PIN" 
-                     class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
+              <input v-model="pinConfirm" type="password" placeholder="Confirm your PIN"
+                class="border-2 border-gray-200 p-3 rounded-lg w-full focus:border-green-500 focus:outline-none transition-colors" />
             </div>
-            
-            <button @click="saveUser" 
-                    class="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg shadow-md mt-6">
+
+            <button @click="saveUser"
+              class="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg shadow-md mt-6">
               Save User
             </button>
-            
+
             <p v-if="pinError" class="text-red-600 text-center text-sm mt-2">{{ pinError }}</p>
           </div>
         </div>
@@ -95,13 +124,14 @@
         <div v-else class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
           <div class="mb-6">
             <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <p class="text-green-600 font-bold text-xl mb-2">Success!</p>
             <p class="text-gray-700">{{ completionMsg }}</p>
           </div>
-          <button @click="goToIdle" 
-                  class="px-8 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold shadow-md">
+          <button @click="goToIdle"
+            class="px-8 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold shadow-md">
             Go to Home
           </button>
         </div>
@@ -129,6 +159,10 @@ const pinError = ref('')
 const completionMsg = ref('')
 const isAdminUser = ref(false)
 
+//ux
+const showOverlay = ref(true)
+const understood = ref(false)
+
 // composable
 const { addUser, hasAdmin } = useLocalDb()
 const faceCam = ref(null)
@@ -155,10 +189,10 @@ function saveUser() {
     pinError.value = "Name cannot be empty."
     return
   }
-  
+
   const isFirstAdmin = !hasAdmin()
   const willBeAdmin = isFirstAdmin || isAdminUser.value
-  
+
   // Validate PIN for admin users (first admin or new admin)
   if (willBeAdmin) {
     if (!pin.value || !pinConfirm.value) {
@@ -170,7 +204,7 @@ function saveUser() {
       return
     }
   }
-  
+
   if (!email.value || !/.+@.+\..+/.test(email.value)) {
     pinError.value = "Please enter a valid email address."
     return
