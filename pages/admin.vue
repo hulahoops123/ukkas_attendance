@@ -11,25 +11,27 @@
       <span class="ball"></span>
     </div>
 
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold">Admin Dashboard</h1>
-        <div v-if="deferredPrompt" class="bg-green-700 text-white p-4 rounded mb-6 flex items-center gap-3">
-          <p class="text-lg font-semibold">📲 Install this app on your device?</p>
-          <button @click="deferredPrompt.prompt()"
-            class="bg-white text-green-800 px-3 py-1 rounded hover:bg-gray-200">Install</button>
-          <button @click="deferredPrompt = null"
-            class="bg-white text-green-800 px-3 py-1 rounded hover:bg-gray-200">Dismiss</button>
-        </div>
-      <div class="flex gap-2">
-        <button @click="showHelp = true" class="text-gray-500 rounded bg-yellow-500 hover:text-gray-800 ml-2"
-          aria-label="Help">
-          ❓
-        </button>
-        <button @click="goToHome"
-          class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 flex items-center gap-2">
-          <span>🏠</span> Home
-        </button>
-      </div>
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+  <div class="flex gap-2">
+    <button @click="showHelp = true" class="text-gray-500 rounded bg-yellow-500 hover:text-gray-800 ml-2"
+      aria-label="Help">
+      ❓
+    </button>
+    <button @click="goToHome"
+      class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 flex items-center gap-2">
+      <span>🏠</span> Home
+    </button>
+  </div>
+</div>
+    <div v-if="deferredPrompt" class="bg-green-700 text-white p-4 rounded mb-6 flex items-center gap-3">
+      <p class="text-lg font-semibold">📲 Install this app on your device?</p>
+      <button @click="deferredPrompt.prompt()" class="bg-white text-green-800 px-3 py-1 rounded hover:bg-gray-200">
+        Install
+      </button>
+      <button @click="deferredPrompt = null" class="bg-white text-green-800 px-3 py-1 rounded hover:bg-gray-200">
+        Dismiss
+      </button>
     </div>
 
     <div class="bg-white bg-opacity-90 p-4 rounded-lg mb-6">
@@ -364,14 +366,18 @@ const deferredPrompt = ref(null)
 
 onMounted(() => {
   window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('🔥 beforeinstallprompt fired')
     e.preventDefault()
     deferredPrompt.value = e
   })
 
   window.addEventListener('appinstalled', () => {
+    console.log('✅ App installed')
     deferredPrompt.value = null
   })
 })
+
+
 
 </script>
 
